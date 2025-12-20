@@ -20,8 +20,9 @@
 #define LED_DELAY_MS 1000
 #endif
 
-#define STEPPER_STEP_PIN 2 // GPIO pin for stepper step control
-#define STEPPER_DIR_PIN 3  // GPIO pin for stepper direction control
+#define STEPPER_STEP_PIN    2 // GPIO pin for stepper step control
+#define STEPPER_DIR_PIN     3 // GPIO pin for stepper direction control
+#define STEPPER_ENABLE_PIN  4 // GPIO pin for stepper enable control
 #define STEPPER_DIRECTION_FORWARD 1
 #define STEPPER_DIRECTION_BACKWARD 0
 
@@ -32,6 +33,7 @@ typedef struct stepper_state
     int target_position;  // Target position in steps
     int step_period_ms;   // Step period in milliseconds
     bool moving;          // Is the stepper currently moving
+    bool enabled;         // Is the stepper enabled
 } stepper_state_t;
 
 // Global variables
@@ -54,6 +56,8 @@ volatile int ms_ticks_count = 0;
 #define MOVE_STEPPER_RELATIVE_COMMAND   "move_stepper_relative "
 #define STOP_STEPPER_COMMAND            "stop_stepper"
 #define GET_STEPPER_STATUS_COMMAND      "get_stepper_status"
+#define ENABLE_STEPPER_COMMAND          "enable_stepper"
+#define DISABLE_STEPPER_COMMAND         "disable_stepper"
 
 // Help message
 const char* help_message =
@@ -65,6 +69,8 @@ const char* help_message =
     "  move_stepper_relative <steps> - Move the stepper by a relative number of steps\n"
     "  stop_stepper                  - Stop the stepper motor\n"
     "  get_stepper_status            - Get the current status of the stepper motor\n"
+    "  enable_stepper                - Enable the stepper motor\n"
+    "  disable_stepper               - Disable the stepper motor\n"
     "  help                          - Show this help message\n"
     "-----\n";
 
@@ -113,6 +119,15 @@ bool stepper_stop(stepper_state_t* stepper);
     @return: true on success, false on failure
  */
 bool stepper_get_status(stepper_state_t* stepper);
+
+/**
+    Enable the stepper motor
+
+    @param stepper: pointer to stepper state structure, must not be NULL
+    @param enable: true to enable, false to disable
+    @return: true on success, false on failure
+ */
+bool stepper_enable(stepper_state_t* stepper, bool enable);
 
 /** 
     Initialise the LED
@@ -229,7 +244,7 @@ int main()
                 process_command(cmd, &stepper);
                 // Reset for next command
                 printf("#: ");
-                cmd = NULL;
+                cmd = NULL; // Clear command pointer, probably not necessary
             }
 
             // Process stepper movement
@@ -314,7 +329,11 @@ int process_command(const char* cmd, stepper_state_t* stepper)
     else if(strncmp(cmd, MOVE_STEPPER_ABSOLUTE_COMMAND, strlen(MOVE_STEPPER_ABSOLUTE_COMMAND)) == 0)
     {
         int target_position = atoi(cmd + strlen(MOVE_STEPPER_ABSOLUTE_COMMAND));
-        if(stepper_set_target_position(stepper, target_position))
+        if(stepper->enabled == false)
+        {
+            printf("Error: Stepper motor is disabled. Enable it first.\n");
+        }
+        else if(stepper_set_target_position(stepper, target_position))
         {
             printf("Moving stepper to absolute position %d\n", target_position);
             stepper->moving = true;
@@ -329,7 +348,11 @@ int process_command(const char* cmd, stepper_state_t* stepper)
     {
         int relative_steps = atoi(cmd + strlen(MOVE_STEPPER_RELATIVE_COMMAND));
         int target_position = stepper->current_position + relative_steps;
-        if(stepper_set_target_position(stepper, target_position))
+        if(stepper->enabled == false)
+        {
+            printf("Error: Stepper motor is disabled. Enable it first.\n");
+        }
+        else if(stepper_set_target_position(stepper, target_position))
         {
             printf("Moving stepper to relative position %d\n", target_position);
             stepper->moving = true;
@@ -358,6 +381,18 @@ int process_command(const char* cmd, stepper_state_t* stepper)
         {
             printf("Error: Could not get stepper status\n");
         }
+    }
+    // command to enable stepper
+    else if(strncmp(cmd, ENABLE_STEPPER_COMMAND, strlen(ENABLE_STEPPER_COMMAND)) == 0)
+    {
+        stepper_enable(stepper, true);
+        printf("Stepper motor enabled\n");
+    }
+    // command to disable stepper
+    else if(strncmp(cmd, DISABLE_STEPPER_COMMAND, strlen(DISABLE_STEPPER_COMMAND)) == 0)
+    {
+        stepper_enable(stepper, false); 
+        printf("Stepper motor disabled\n");
     }
     // help command
     else if (strncmp(cmd, "help", 4) == 0 || strncmp(cmd, "", 1) == 0) 
@@ -479,6 +514,8 @@ bool stepper_init(stepper_state_t* stepper, int initial_position, int step_perio
     stepper->target_position = initial_position;
     stepper->step_period_ms = step_period_ms;
     stepper->moving = false;
+    stepper->enabled = false;
+    return true;
 }
 
 bool stepper_set_target_position(stepper_state_t* stepper, int target_position)
@@ -538,6 +575,27 @@ bool stepper_get_status(stepper_state_t* stepper)
     printf("  Target Position: %d\n", stepper->target_position);
     printf("  Step Period (ms): %d\n", stepper->step_period_ms);
     printf("  Moving: %s\n", stepper->moving ? "Yes" : "No");
+    printf("  Enabled: %s\n", stepper->enabled ? "Yes" : "No");
+    return true;
+}
+
+bool stepper_enable(stepper_state_t* stepper, bool enable)
+{
+    static bool gpio_initialized = false;
+    if(!gpio_initialized)
+    {
+        gpio_init(STEPPER_ENABLE_PIN);
+        gpio_set_dir(STEPPER_ENABLE_PIN, GPIO_OUT);
+        gpio_initialized = true;
+    }
+
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    gpio_put(STEPPER_ENABLE_PIN, enable ? 1 : 0); // Enable or disable the stepper motor
+    stepper->enabled = enable;
     return true;
 }
 
