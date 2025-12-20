@@ -1,10 +1,13 @@
-/*
-    claw.c
-    Created by Jon Wade on 19 Dec 2025
-    Copyright (c) 2025 Jon Wade. Standard MIT License applies. See LICENSE file.
-
-    Claw command interface for controlling stepper motors and other functions associated with the claw device.
-    This file implements a simple command interface over USB serial to control the claw device.
+/**
+    * @file claw.c
+    * @author Jon Wade
+    * @date  19 Dec 2025
+    * @copyright (c) 2025 Jon Wade. Standard MIT License applies. See LICENSE file.
+    *
+    * @brief Firmware to control a claw device with stepper motors via USB serial commands.
+    * 
+    * Command interface for controlling stepper motors and other functions associated with the claw device.
+    * This file implements a simple command interface over USB serial to control the claw device.
 */
 
 #include <stdio.h>
@@ -26,22 +29,34 @@
 #define STEPPER_DIRECTION_FORWARD 1
 #define STEPPER_DIRECTION_BACKWARD 0
 
-// Stepper state structure
+/*!
+ * @brief Structure to hold stepper motor state
+ */
 typedef struct stepper_state
 {
-    int current_position; // Current position in steps
-    int target_position;  // Target position in steps
-    int step_period_ms;   // Step period in milliseconds
-    bool moving;          // Is the stepper currently moving
-    bool enabled;         // Is the stepper enabled
+    int current_position; //!< Current position in steps
+    int target_position;  //!< Target position in steps
+    int step_period_ms;   //!< Step period in milliseconds
+    bool moving;          //!< Is the stepper currently moving
+    bool enabled;         //!< Is the stepper enabled
 } stepper_state_t;
 
 // Global variables
 
-/* Global LED period in milliseconds */
+/*! 
+ * @brief LED blink period in milliseconds
+ * 
+ * This variable can be modified via command interface to change the LED blink rate.
+ */
 volatile int led_period = LED_DELAY_MS;
 
-/* Global millisecond ticks count */
+/*! 
+ * @brief Global millisecond ticks count
+ *
+ * This variable is incremented by the millisecond timer callback
+ * and decremented in the main loop to track when the millisecond tasks should run. 
+ */
+
 volatile int ms_ticks_count = 0;
 
 // Command definitions
@@ -59,7 +74,11 @@ volatile int ms_ticks_count = 0;
 #define ENABLE_STEPPER_COMMAND          "enable_stepper"
 #define DISABLE_STEPPER_COMMAND         "disable_stepper"
 
-// Help message
+/*! 
+ * @brief Help message
+ *
+ * This message is displayed when the user requests help or enters an unknown command.
+ */
 const char* help_message =
     "Available commands:\n"
     "  led_period <ms>               - Set the LED blink period in milliseconds\n"
@@ -76,125 +95,129 @@ const char* help_message =
 
 // Function prototypes
 
-/**
-    Initialize the stepper state
-
-    @param stepper: pointer to stepper state structure to initialize, must not be NULL
-    @param initial_position: initial position in steps must be between MIN_STEPPER_POSITION and MAX_STEPPER_POSITION
-    @param step_period_ms: step period in milliseconds must be greater than 1 ms
-    @return: true on success, false on failure
+/*!
+ * @brief Initialize the stepper state
+ *
+ * @param stepper: pointer to stepper state structure to initialize, must not be NULL
+ * @param initial_position: initial position in steps must be between MIN_STEPPER_POSITION and MAX_STEPPER_POSITION
+ * @param step_period_ms: step period in milliseconds must be greater than 1 ms
+ * @return: true on success, false on failure
  */
 bool stepper_init(stepper_state_t* stepper, int initial_position, int step_period_ms);
 
-/**
-    Set the target position for the stepper motor
-
-    @param stepper: pointer to stepper state structure, must not be NULL
-    @param target_position: target position in steps must be between MIN_STEPPER_POSITION and MAX_STEPPER_POSITION
-    @return: true on success, false on failure
+/*!
+ * @brief Set the target position for the stepper motor
+ *
+ * @param stepper: pointer to stepper state structure, must not be NULL
+ * @param target_position: target position in steps must be between MIN_STEPPER_POSITION and MAX_STEPPER_POSITION
+ * @return: true on success, false on failure
  */
 bool stepper_set_target_position(stepper_state_t* stepper, int target_position);
 
-/**
-    Set the step period for the stepper motor
-
-    @param stepper: pointer to stepper state structure, must not be NULL
-    @param step_period_ms: step period in milliseconds must be greater than 1 ms
-    @return: true on success, false on failure
+/*!
+ * @brief Set the step period for the stepper motor
+ *
+ * @param stepper: pointer to stepper state structure, must not be NULL
+ * @param step_period_ms: step period in milliseconds must be greater than 1 ms
+ * @return: true on success, false on failure
  */
 bool stepper_set_step_period(stepper_state_t* stepper, int step_period_ms);
 
-/**
-    Stop the stepper motor, setting target position to current position
-
-    @param stepper: pointer to stepper state structure, must not be NULL
-    @return: true on success, false on failure
+/*!
+ * @brief Stop the stepper motor, setting target position to current position
+ *
+ * @param stepper: pointer to stepper state structure, must not be NULL
+ * @return: true on success, false on failure
  */
 bool stepper_stop(stepper_state_t* stepper);
 
-/**
-    Get the current status of the stepper motor, printing to stdout
-
-    @param stepper: pointer to stepper state structure, must not be NULL
-    @return: true on success, false on failure
+/*!
+ * @brief Get the current status of the stepper motor, printing to stdout
+ *
+ * @param stepper: pointer to stepper state structure, must not be NULL
+ * @return: true on success, false on failure
  */
 bool stepper_get_status(stepper_state_t* stepper);
 
-/**
-    Enable the stepper motor
-
-    @param stepper: pointer to stepper state structure, must not be NULL
-    @param enable: true to enable, false to disable
-    @return: true on success, false on failure
+/*!
+ * @brief Enable the stepper motor
+ *
+ * @param stepper: pointer to stepper state structure, must not be NULL
+ * @param enable: true to enable, false to disable
+ * @return: true on success, false on failure
  */
 bool stepper_enable(stepper_state_t* stepper, bool enable);
 
-/** 
-    Initialise the LED
-
-    @param: none
-    @return: PICO_OK on success
+/*!
+ * @brief Initialise the LED
+ *
+ * @param: none
+ * @return: PICO_OK on success
             error code on failure
  */
 int pico_led_init(void);
 
-/**
-    Turn the LED on or off
-
-    @param led_on: true to turn on, false to turn off
-    @return: none
+/*!
+ * @brief Turn the LED on or off
+ *
+ * @param led_on: true to turn on, false to turn off
+ * @return: none
  */
 void pico_set_led(bool led_on);
 
-/**
-    Process stepper movement
-
-    @param stepper: pointer to stepper state structure
-    @return: true if stepper is still moving, false if it has reached target
+/*!
+ * @brief Process stepper movement
+ *
+ * @param stepper: pointer to stepper state structure
+ * @return: true if stepper is still moving, false if it has reached target
  */
 bool process_stepper_movement(stepper_state_t* stepper);
 
-/**
-    Process LED timing tick
-
-    @param: none
-    @return: none 
+/*!
+ * @brief Process LED timing tick
+ *
+ * @param: none
+ * @return: none 
  */
 void process_led_tick(void);
 
-/**
-    Millisecond timer callback
-
-    @note: This function is called every millisecond by the repeating timer.
-
-    @param t: pointer to repeating_timer struct
-    @return: true to keep repeating, false to stop
+/*!
+ * @brief Millisecond timer callback
+ *
+ * @note: This function is called every millisecond by the repeating timer.
+ *
+ * @param t: pointer to repeating_timer struct
+ * @return: true to keep repeating, false to stop
  */
 bool ms_timer_callback(struct repeating_timer *t);
 
-/** 
-    Process a command string
-
-    @param cmd: pointer to command string
-    @param stepper: pointer to stepper state structure
-    @return: 0 on success, error code on failure
+/*!
+ * @brief Process a command string
+ *
+ * @param cmd: pointer to command string
+ * @param stepper: pointer to stepper state structure
+ * @return: 0 on success, error code on failure
  */
 int process_command(const char* cmd, stepper_state_t* stepper);
 
-/**
-    Process stdin input
-
-    @note: This function reads characters from stdin,
-           builds commands, and processes them when a newline is received.
-
-           This function has a simple lock to prevent re-entrancy.
-
-    @param: none
-    @return: none
+/*!
+ * @brief Process stdin input
+ *
+ * @note: This function reads characters from stdin,
+ *        builds commands, and processes them when a newline is received.
+ *
+ *        This function has a simple lock to prevent re-entrancy.
+ *
+ * @param: none
+ * @return: none
  */
 char* process_stdin_input(void);
 
-// Main function
+/*!
+ * @brief Main function
+ * @param: none
+ * @return: none    
+ */ 
 int main()
 {
     char* cmd;
@@ -258,7 +281,6 @@ int main()
 
 /* -------------------------- helper functions -----------------------------*/
 
-// Perform led initialisation
 int pico_led_init(void) 
 {
 #if defined(PICO_DEFAULT_LED_PIN)
@@ -273,7 +295,6 @@ int pico_led_init(void)
 #endif
 }
 
-// Turn the led on or off
 void pico_set_led(bool led_on) 
 {
 #if defined(PICO_DEFAULT_LED_PIN)
