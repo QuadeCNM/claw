@@ -102,6 +102,7 @@ $(function(){initNavTree('claw_8c.html','',''); });
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &quot;hardware/gpio.h&quot;</code><br />
 <code>#include &lt;ctype.h&gt;</code><br />
+<code>#include &lt;math.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -150,6 +151,8 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight"><b>MOVE_STEPPER_ABSOLUTE_COMMAND</b>&#160;&#160;&#160;&quot;move_stepper_absolute &quot;</td></tr>
 <tr class="memitem:a2216f2a87bf93f85c6af2b35daab961d" id="r_a2216f2a87bf93f85c6af2b35daab961d"><td class="memItemLeft"><a id="a2216f2a87bf93f85c6af2b35daab961d" name="a2216f2a87bf93f85c6af2b35daab961d"></a>
 #define&#160;</td><td class="memItemRight"><b>MOVE_STEPPER_RELATIVE_COMMAND</b>&#160;&#160;&#160;&quot;move_stepper_relative &quot;</td></tr>
+<tr class="memitem:a337c2441fcc5007766b9fd0cd07eedad" id="r_a337c2441fcc5007766b9fd0cd07eedad"><td class="memItemLeft"><a id="a337c2441fcc5007766b9fd0cd07eedad" name="a337c2441fcc5007766b9fd0cd07eedad"></a>
+#define&#160;</td><td class="memItemRight"><b>MOVE_STEPPER_ROTATIONS_COMMAND</b>&#160;&#160;&#160;&quot;move_stepper_rotations &quot;</td></tr>
 <tr class="memitem:aff9f5c0a44d1b386918d1ab242b78341" id="r_aff9f5c0a44d1b386918d1ab242b78341"><td class="memItemLeft"><a id="aff9f5c0a44d1b386918d1ab242b78341" name="aff9f5c0a44d1b386918d1ab242b78341"></a>
 #define&#160;</td><td class="memItemRight"><b>STOP_STEPPER_COMMAND</b>&#160;&#160;&#160;&quot;stop_stepper&quot;</td></tr>
 <tr class="memitem:a50107101d35084c8eff46d90af286a01" id="r_a50107101d35084c8eff46d90af286a01"><td class="memItemLeft"><a id="a50107101d35084c8eff46d90af286a01" name="a50107101d35084c8eff46d90af286a01"></a>
@@ -624,17 +627,19 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">                    =</div>
+<div class="line"><span class="stringliteral">&quot;\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;Available commands:\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  led_period &lt;ms&gt;               - Set the LED blink period in milliseconds\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  set_stepper_period &lt;us&gt;       - Set the stepper motor step period in us\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  set_stepper_zero              - Set the current position to zero\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  move_stepper_absolute &lt;steps&gt; - Move the stepper to an absolute position\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  move_stepper_relative &lt;steps&gt; - Move the stepper by a relative number of steps\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  stop_stepper                  - Stop the stepper motor\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  get_stepper_status            - Get the current status of the stepper motor\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  enable_stepper                - Enable the stepper motor\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  disable_stepper               - Disable the stepper motor\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  help                          - Show this help message\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  led_period &lt;ms&gt;                    - Set the LED blink period in milliseconds\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  set_stepper_period &lt;us&gt;            - Set the stepper motor step period in us\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  set_stepper_zero                   - Set the current position to zero\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  move_stepper_absolute &lt;steps&gt;      - Move the stepper to an absolute position\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  move_stepper_relative &lt;steps&gt;      - Move the stepper by a relative number of steps\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  move_stepper_rotations &lt;rotations&gt; - Move the stepper by a number of rotations\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  stop_stepper                       - Stop the stepper motor\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  get_stepper_status                 - Get the current status of the stepper motor\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  enable_stepper                     - Enable the stepper motor\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  disable_stepper                    - Disable the stepper motor\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  help                               - Show this help message\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;-----\n&quot;</span></div>
 </div><!-- fragment -->
 <p>Help message. </p>

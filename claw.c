@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include "hardware/gpio.h"
 #include <ctype.h>
+#include <math.h>
 
 // Define default LED delay if not defined
 #ifndef LED_DELAY_MS
@@ -87,6 +88,7 @@ volatile int ms_ticks_count = 0;
 #define SET_STEPPER_ZERO_COMMAND        "set_stepper_zero"
 #define MOVE_STEPPER_ABSOLUTE_COMMAND   "move_stepper_absolute "
 #define MOVE_STEPPER_RELATIVE_COMMAND   "move_stepper_relative "
+#define MOVE_STEPPER_ROTATIONS_COMMAND  "move_stepper_rotations "
 #define STOP_STEPPER_COMMAND            "stop_stepper"
 #define GET_STEPPER_STATUS_COMMAND      "get_stepper_status"
 #define ENABLE_STEPPER_COMMAND          "enable_stepper"
@@ -98,17 +100,19 @@ volatile int ms_ticks_count = 0;
  * This message is displayed when the user requests help or enters an unknown command.
  */
 const char* help_message =
+    "\n"
     "Available commands:\n"
-    "  led_period <ms>               - Set the LED blink period in milliseconds\n"
-    "  set_stepper_period <us>       - Set the stepper motor step period in us\n"
-    "  set_stepper_zero              - Set the current position to zero\n"
-    "  move_stepper_absolute <steps> - Move the stepper to an absolute position\n"
-    "  move_stepper_relative <steps> - Move the stepper by a relative number of steps\n"
-    "  stop_stepper                  - Stop the stepper motor\n"
-    "  get_stepper_status            - Get the current status of the stepper motor\n"
-    "  enable_stepper                - Enable the stepper motor\n"
-    "  disable_stepper               - Disable the stepper motor\n"
-    "  help                          - Show this help message\n"
+    "  led_period <ms>                    - Set the LED blink period in milliseconds\n"
+    "  set_stepper_period <us>            - Set the stepper motor step period in us\n"
+    "  set_stepper_zero                   - Set the current position to zero\n"
+    "  move_stepper_absolute <steps>      - Move the stepper to an absolute position\n"
+    "  move_stepper_relative <steps>      - Move the stepper by a relative number of steps\n"
+    "  move_stepper_rotations <rotations> - Move the stepper by a number of rotations\n"
+    "  stop_stepper                       - Stop the stepper motor\n"
+    "  get_stepper_status                 - Get the current status of the stepper motor\n"
+    "  enable_stepper                     - Enable the stepper motor\n"
+    "  disable_stepper                    - Disable the stepper motor\n"
+    "  help                               - Show this help message\n"
     "-----\n";
 
 // Function prototypes
@@ -415,6 +419,29 @@ int process_command(const char* cmd, stepper_state_t* stepper)
             printf("Error: Invalid target position\n");
         }
     }
+    // command to move stepper by relative rotations
+    else if(strncmp(cmd, MOVE_STEPPER_ROTATIONS_COMMAND, strlen(MOVE_STEPPER_ROTATIONS_COMMAND)) == 0)
+    {
+        double relative_rotations = atof(cmd + strlen(MOVE_STEPPER_ROTATIONS_COMMAND));
+        int relative_steps = (int)round(relative_rotations * STEPPER_STEPS_PER_REV);
+        int target_position = stepper->current_position + relative_steps;
+        // Check if stepper is enabled
+        if(stepper->enabled == false)
+        {
+            printf("Error: Stepper motor is disabled. Enable it first.\n");
+        }
+        // Check for valid target position
+        else if(stepper_set_target_position(stepper, target_position))
+        {
+            printf("Moving stepper by %+f rotations to position %d\n", relative_rotations, target_position);
+            stepper->moving = true;
+        }
+        else
+        {
+            printf("Error: Invalid target position\n");
+        }
+    }
+
     // command to stop stepper
     else if(strncmp(cmd, STOP_STEPPER_COMMAND, strlen(STOP_STEPPER_COMMAND)) == 0)
     {
@@ -510,6 +537,7 @@ char* process_stdin_input(void)
         {
             cmd_buffer[cmd_buffer_index] = '\0';
             process_cmd = true;
+            putchar('\n');
         }
         // Handle backspace
         else if((cmd_buffer[cmd_buffer_index] == '\b' || cmd_buffer[cmd_buffer_index] == 127) && cmd_buffer_index > 0)
