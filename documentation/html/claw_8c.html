@@ -101,6 +101,7 @@ $(function(){initNavTree('claw_8c.html','',''); });
 <code>#include &quot;pico/assert.h&quot;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &quot;hardware/gpio.h&quot;</code><br />
+<code>#include &lt;ctype.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -111,24 +112,34 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:ae89a64708a9f72dd2d40c74a8c8d4e56" id="r_ae89a64708a9f72dd2d40c74a8c8d4e56"><td class="memItemLeft"><a id="ae89a64708a9f72dd2d40c74a8c8d4e56" name="ae89a64708a9f72dd2d40c74a8c8d4e56"></a>
 #define&#160;</td><td class="memItemRight"><b>LED_DELAY_MS</b>&#160;&#160;&#160;1000</td></tr>
+<tr class="memitem:a52a33c02fffbb557b0237606b5cd9209" id="r_a52a33c02fffbb557b0237606b5cd9209"><td class="memItemLeft"><a id="a52a33c02fffbb557b0237606b5cd9209" name="a52a33c02fffbb557b0237606b5cd9209"></a>
+#define&#160;</td><td class="memItemRight"><b>TIMER_INTERVAL_US</b>&#160;&#160;&#160;10</td></tr>
+<tr class="memitem:a79e98ee3a2d403051d850f85009e760e" id="r_a79e98ee3a2d403051d850f85009e760e"><td class="memItemLeft"><a id="a79e98ee3a2d403051d850f85009e760e" name="a79e98ee3a2d403051d850f85009e760e"></a>
+#define&#160;</td><td class="memItemRight"><b>DEFAULT_STEPPER_PERIOD</b>&#160;&#160;&#160;4</td></tr>
+<tr class="memitem:a6a9812bb49a8960e0b61dce8dca1cd09" id="r_a6a9812bb49a8960e0b61dce8dca1cd09"><td class="memItemLeft"><a id="a6a9812bb49a8960e0b61dce8dca1cd09" name="a6a9812bb49a8960e0b61dce8dca1cd09"></a>
+#define&#160;</td><td class="memItemRight"><b>MIN_STEPPER_PERIOD</b>&#160;&#160;&#160;4</td></tr>
 <tr class="memitem:a8866d3169589b614bd15ef12b8061423" id="r_a8866d3169589b614bd15ef12b8061423"><td class="memItemLeft"><a id="a8866d3169589b614bd15ef12b8061423" name="a8866d3169589b614bd15ef12b8061423"></a>
 #define&#160;</td><td class="memItemRight"><b>STEPPER_STEP_PIN</b>&#160;&#160;&#160;2</td></tr>
 <tr class="memitem:ad09482b368d859f60961af04f61d4e1e" id="r_ad09482b368d859f60961af04f61d4e1e"><td class="memItemLeft"><a id="ad09482b368d859f60961af04f61d4e1e" name="ad09482b368d859f60961af04f61d4e1e"></a>
 #define&#160;</td><td class="memItemRight"><b>STEPPER_DIR_PIN</b>&#160;&#160;&#160;3</td></tr>
 <tr class="memitem:a1ebda90b3ee2eb88e6b910b3be51e62e" id="r_a1ebda90b3ee2eb88e6b910b3be51e62e"><td class="memItemLeft"><a id="a1ebda90b3ee2eb88e6b910b3be51e62e" name="a1ebda90b3ee2eb88e6b910b3be51e62e"></a>
 #define&#160;</td><td class="memItemRight"><b>STEPPER_ENABLE_PIN</b>&#160;&#160;&#160;4</td></tr>
+<tr class="memitem:a90090836925ff8d0c8c7e07180e3afcb" id="r_a90090836925ff8d0c8c7e07180e3afcb"><td class="memItemLeft"><a id="a90090836925ff8d0c8c7e07180e3afcb" name="a90090836925ff8d0c8c7e07180e3afcb"></a>
+#define&#160;</td><td class="memItemRight"><b>STEPPER_ENABLE_PIN_INVERTED</b>&#160;&#160;&#160;true</td></tr>
 <tr class="memitem:ab59fc4a21cd29f0b53cd67443b28cb9a" id="r_ab59fc4a21cd29f0b53cd67443b28cb9a"><td class="memItemLeft"><a id="ab59fc4a21cd29f0b53cd67443b28cb9a" name="ab59fc4a21cd29f0b53cd67443b28cb9a"></a>
 #define&#160;</td><td class="memItemRight"><b>STEPPER_DIRECTION_FORWARD</b>&#160;&#160;&#160;1</td></tr>
 <tr class="memitem:af4aa730b7a255f273b8155b07ba04dcb" id="r_af4aa730b7a255f273b8155b07ba04dcb"><td class="memItemLeft"><a id="af4aa730b7a255f273b8155b07ba04dcb" name="af4aa730b7a255f273b8155b07ba04dcb"></a>
 #define&#160;</td><td class="memItemRight"><b>STEPPER_DIRECTION_BACKWARD</b>&#160;&#160;&#160;0</td></tr>
-<tr class="memitem:af1abcb51a4aa27a5a5a7958c03448134" id="r_af1abcb51a4aa27a5a5a7958c03448134"><td class="memItemLeft"><a id="af1abcb51a4aa27a5a5a7958c03448134" name="af1abcb51a4aa27a5a5a7958c03448134"></a>
-#define&#160;</td><td class="memItemRight"><b>MAX_COMMAND_LENGTH</b>&#160;&#160;&#160;50</td></tr>
+<tr class="memitem:af11c1828b48836b1e853be80f0819bf4" id="r_af11c1828b48836b1e853be80f0819bf4"><td class="memItemLeft"><a id="af11c1828b48836b1e853be80f0819bf4" name="af11c1828b48836b1e853be80f0819bf4"></a>
+#define&#160;</td><td class="memItemRight"><b>STEPPER_STEPS_PER_REV</b>&#160;&#160;&#160;3200</td></tr>
+<tr class="memitem:ae6448262632923d788fc0e8797deca2c" id="r_ae6448262632923d788fc0e8797deca2c"><td class="memItemLeft"><a id="ae6448262632923d788fc0e8797deca2c" name="ae6448262632923d788fc0e8797deca2c"></a>
+#define&#160;</td><td class="memItemRight"><b>STEPPER_MAX_REVOLUTIONS</b>&#160;&#160;&#160;15</td></tr>
 <tr class="memitem:a900cc1b2df4d55d6a5cc87f5f80f82c7" id="r_a900cc1b2df4d55d6a5cc87f5f80f82c7"><td class="memItemLeft"><a id="a900cc1b2df4d55d6a5cc87f5f80f82c7" name="a900cc1b2df4d55d6a5cc87f5f80f82c7"></a>
-#define&#160;</td><td class="memItemRight"><b>MAX_STEPPER_POSITION</b>&#160;&#160;&#160;10000</td></tr>
+#define&#160;</td><td class="memItemRight"><b>MAX_STEPPER_POSITION</b>&#160;&#160;&#160;(STEPPER_STEPS_PER_REV * STEPPER_MAX_REVOLUTIONS)</td></tr>
 <tr class="memitem:ac55adc9cd2519e117a51e8df7dad3fb2" id="r_ac55adc9cd2519e117a51e8df7dad3fb2"><td class="memItemLeft"><a id="ac55adc9cd2519e117a51e8df7dad3fb2" name="ac55adc9cd2519e117a51e8df7dad3fb2"></a>
 #define&#160;</td><td class="memItemRight"><b>MIN_STEPPER_POSITION</b>&#160;&#160;&#160;0</td></tr>
-<tr class="memitem:ae01e3a037d687db3896052d2813f935f" id="r_ae01e3a037d687db3896052d2813f935f"><td class="memItemLeft"><a id="ae01e3a037d687db3896052d2813f935f" name="ae01e3a037d687db3896052d2813f935f"></a>
-#define&#160;</td><td class="memItemRight"><b>DEFAULT_STEPPER_PERIOD_MS</b>&#160;&#160;&#160;10</td></tr>
+<tr class="memitem:af1abcb51a4aa27a5a5a7958c03448134" id="r_af1abcb51a4aa27a5a5a7958c03448134"><td class="memItemLeft"><a id="af1abcb51a4aa27a5a5a7958c03448134" name="af1abcb51a4aa27a5a5a7958c03448134"></a>
+#define&#160;</td><td class="memItemRight"><b>MAX_COMMAND_LENGTH</b>&#160;&#160;&#160;50</td></tr>
 <tr class="memitem:a7e07526817a0df66d8c7804f10a3e1bf" id="r_a7e07526817a0df66d8c7804f10a3e1bf"><td class="memItemLeft"><a id="a7e07526817a0df66d8c7804f10a3e1bf" name="a7e07526817a0df66d8c7804f10a3e1bf"></a>
 #define&#160;</td><td class="memItemRight"><b>LED_PERIOD_COMMAND</b>&#160;&#160;&#160;&quot;led_period &quot;</td></tr>
 <tr class="memitem:a7011561f508dcf43e5caf02a250374c2" id="r_a7011561f508dcf43e5caf02a250374c2"><td class="memItemLeft"><a id="a7011561f508dcf43e5caf02a250374c2" name="a7011561f508dcf43e5caf02a250374c2"></a>
@@ -155,12 +166,12 @@ typedef struct <a class="el" href="structstepper__state.html">stepper_state</a>&
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a8b1b337de6806bd6e944572127ebe204" id="r_a8b1b337de6806bd6e944572127ebe204"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a8b1b337de6806bd6e944572127ebe204">stepper_init</a> (stepper_state_t *stepper, int initial_position, int step_period_ms)</td></tr>
-<tr class="memdesc:a8b1b337de6806bd6e944572127ebe204"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the stepper state.  <br /></td></tr>
+<tr class="memitem:a5900932afbcb9b65c2ea29e6c2953f88" id="r_a5900932afbcb9b65c2ea29e6c2953f88"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a5900932afbcb9b65c2ea29e6c2953f88">stepper_init</a> (stepper_state_t *stepper, int initial_position, int step_period)</td></tr>
+<tr class="memdesc:a5900932afbcb9b65c2ea29e6c2953f88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the stepper state.  <br /></td></tr>
 <tr class="memitem:a63e0341592333fe7ba57d48f8e1a137a" id="r_a63e0341592333fe7ba57d48f8e1a137a"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a63e0341592333fe7ba57d48f8e1a137a">stepper_set_target_position</a> (stepper_state_t *stepper, int target_position)</td></tr>
 <tr class="memdesc:a63e0341592333fe7ba57d48f8e1a137a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the target position for the stepper motor.  <br /></td></tr>
-<tr class="memitem:aefece218fe81bcadfecff96235ca058b" id="r_aefece218fe81bcadfecff96235ca058b"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#aefece218fe81bcadfecff96235ca058b">stepper_set_step_period</a> (stepper_state_t *stepper, int step_period_ms)</td></tr>
-<tr class="memdesc:aefece218fe81bcadfecff96235ca058b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the step period for the stepper motor.  <br /></td></tr>
+<tr class="memitem:a9ba0584cb9ff909bdc1307b5bc78860c" id="r_a9ba0584cb9ff909bdc1307b5bc78860c"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a9ba0584cb9ff909bdc1307b5bc78860c">stepper_set_step_period</a> (stepper_state_t *stepper, int step_period_us)</td></tr>
+<tr class="memdesc:a9ba0584cb9ff909bdc1307b5bc78860c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the step period for the stepper motor.  <br /></td></tr>
 <tr class="memitem:a2618732501f937687962beecaedfe2f4" id="r_a2618732501f937687962beecaedfe2f4"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a2618732501f937687962beecaedfe2f4">stepper_stop</a> (stepper_state_t *stepper)</td></tr>
 <tr class="memdesc:a2618732501f937687962beecaedfe2f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop the stepper motor, setting target position to current position.  <br /></td></tr>
 <tr class="memitem:a51e4183c1284ad57bb958432b9198074" id="r_a51e4183c1284ad57bb958432b9198074"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a51e4183c1284ad57bb958432b9198074">stepper_get_status</a> (stepper_state_t *stepper)</td></tr>
@@ -175,8 +186,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a42d78cd362181f20ff7bb0ca012d4b68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process stepper movement.  <br /></td></tr>
 <tr class="memitem:a188c27cc34240da2d8de48c84d9ab13c" id="r_a188c27cc34240da2d8de48c84d9ab13c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a188c27cc34240da2d8de48c84d9ab13c">process_led_tick</a> (void)</td></tr>
 <tr class="memdesc:a188c27cc34240da2d8de48c84d9ab13c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process LED timing tick.  <br /></td></tr>
-<tr class="memitem:a97090408d65f298ebaf69fc2844f2e99" id="r_a97090408d65f298ebaf69fc2844f2e99"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a97090408d65f298ebaf69fc2844f2e99">ms_timer_callback</a> (struct repeating_timer *t)</td></tr>
-<tr class="memdesc:a97090408d65f298ebaf69fc2844f2e99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Millisecond timer callback.  <br /></td></tr>
+<tr class="memitem:a9c64a585f107e6322134ec3e4d9caed0" id="r_a9c64a585f107e6322134ec3e4d9caed0"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a9c64a585f107e6322134ec3e4d9caed0">timer_callback</a> (struct repeating_timer *t)</td></tr>
+<tr class="memdesc:a9c64a585f107e6322134ec3e4d9caed0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Millisecond timer callback.  <br /></td></tr>
 <tr class="memitem:acb6560289999406da7438c797fd298d2" id="r_acb6560289999406da7438c797fd298d2"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#acb6560289999406da7438c797fd298d2">process_command</a> (const char *cmd, stepper_state_t *stepper)</td></tr>
 <tr class="memdesc:acb6560289999406da7438c797fd298d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a command string.  <br /></td></tr>
 <tr class="memitem:adb12b21353b01db540ea04071a5bfd67" id="r_adb12b21353b01db540ea04071a5bfd67"><td class="memItemLeft">char *&#160;</td><td class="memItemRight"><a class="el" href="#adb12b21353b01db540ea04071a5bfd67">process_stdin_input</a> (void)</td></tr>
@@ -188,6 +199,8 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a208cce199518a84b523e92e2ef368eef" id="r_a208cce199518a84b523e92e2ef368eef"><td class="memItemLeft">volatile int&#160;</td><td class="memItemRight"><a class="el" href="#a208cce199518a84b523e92e2ef368eef">led_period</a> = LED_DELAY_MS</td></tr>
 <tr class="memdesc:a208cce199518a84b523e92e2ef368eef"><td class="mdescLeft">&#160;</td><td class="mdescRight">LED blink period in milliseconds.  <br /></td></tr>
+<tr class="memitem:af1b4a703a8b19086cc80aaf5467052f7" id="r_af1b4a703a8b19086cc80aaf5467052f7"><td class="memItemLeft">volatile int&#160;</td><td class="memItemRight"><a class="el" href="#af1b4a703a8b19086cc80aaf5467052f7">ten_us_ticks_count</a> = 0</td></tr>
+<tr class="memdesc:af1b4a703a8b19086cc80aaf5467052f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global ten microsecond ticks count.  <br /></td></tr>
 <tr class="memitem:a06a164f23588c789a6894f0bf8459ad5" id="r_a06a164f23588c789a6894f0bf8459ad5"><td class="memItemLeft">volatile int&#160;</td><td class="memItemRight"><a class="el" href="#a06a164f23588c789a6894f0bf8459ad5">ms_ticks_count</a> = 0</td></tr>
 <tr class="memdesc:a06a164f23588c789a6894f0bf8459ad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global millisecond ticks count.  <br /></td></tr>
 <tr class="memitem:a21e04a6194b563933868a24dc4bbec1a" id="r_a21e04a6194b563933868a24dc4bbec1a"><td class="memItemLeft">const char *&#160;</td><td class="memItemRight"><a class="el" href="#a21e04a6194b563933868a24dc4bbec1a">help_message</a></td></tr>
@@ -223,33 +236,6 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>: none </dd></dl>
-
-</div>
-</div>
-<a id="a97090408d65f298ebaf69fc2844f2e99" name="a97090408d65f298ebaf69fc2844f2e99"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97090408d65f298ebaf69fc2844f2e99">&#9670;&#160;</a></span>ms_timer_callback()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool ms_timer_callback </td>
-          <td>(</td>
-          <td class="paramtype">struct repeating_timer *</td>          <td class="paramname"><span class="paramname"><em>t</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Millisecond timer callback. </p>
-<dl class="section note"><dt>Note</dt><dd>: This function is called every millisecond by the repeating timer.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">t</td><td>pointer to repeating_timer struct </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>: true to keep repeating, false to stop </dd></dl>
 
 </div>
 </div>
@@ -473,8 +459,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a8b1b337de6806bd6e944572127ebe204" name="a8b1b337de6806bd6e944572127ebe204"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b1b337de6806bd6e944572127ebe204">&#9670;&#160;</a></span>stepper_init()</h2>
+<a id="a5900932afbcb9b65c2ea29e6c2953f88" name="a5900932afbcb9b65c2ea29e6c2953f88"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5900932afbcb9b65c2ea29e6c2953f88">&#9670;&#160;</a></span>stepper_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -492,7 +478,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>step_period_ms</em></span>&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>step_period</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -502,7 +488,7 @@ Variables</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">stepper</td><td>pointer to stepper state structure to initialize, must not be NULL </td></tr>
     <tr><td class="paramname">initial_position</td><td>initial position in steps must be between MIN_STEPPER_POSITION and MAX_STEPPER_POSITION </td></tr>
-    <tr><td class="paramname">step_period_ms</td><td>step period in milliseconds must be greater than 1 ms </td></tr>
+    <tr><td class="paramname">step_period</td><td>step period in TIMER_INTERVAL_US must be greater than 1 ms </td></tr>
   </table>
   </dd>
 </dl>
@@ -510,8 +496,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aefece218fe81bcadfecff96235ca058b" name="aefece218fe81bcadfecff96235ca058b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aefece218fe81bcadfecff96235ca058b">&#9670;&#160;</a></span>stepper_set_step_period()</h2>
+<a id="a9ba0584cb9ff909bdc1307b5bc78860c" name="a9ba0584cb9ff909bdc1307b5bc78860c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ba0584cb9ff909bdc1307b5bc78860c">&#9670;&#160;</a></span>stepper_set_step_period()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -524,7 +510,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>step_period_ms</em></span>&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>step_period_us</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -533,7 +519,7 @@ Variables</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">stepper</td><td>pointer to stepper state structure, must not be NULL </td></tr>
-    <tr><td class="paramname">step_period_ms</td><td>step period in milliseconds must be greater than 1 ms </td></tr>
+    <tr><td class="paramname">step_period</td><td>step period in microseconds must be greater than MIN_STEPPER_PERIOD </td></tr>
   </table>
   </dd>
 </dl>
@@ -598,6 +584,33 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a9c64a585f107e6322134ec3e4d9caed0" name="a9c64a585f107e6322134ec3e4d9caed0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c64a585f107e6322134ec3e4d9caed0">&#9670;&#160;</a></span>timer_callback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool timer_callback </td>
+          <td>(</td>
+          <td class="paramtype">struct repeating_timer *</td>          <td class="paramname"><span class="paramname"><em>t</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Millisecond timer callback. </p>
+<dl class="section note"><dt>Note</dt><dd>: This function is called every millisecond by the repeating timer.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">t</td><td>pointer to repeating_timer struct </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true to keep repeating, false to stop </dd></dl>
+
+</div>
+</div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
 <a id="a21e04a6194b563933868a24dc4bbec1a" name="a21e04a6194b563933868a24dc4bbec1a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a21e04a6194b563933868a24dc4bbec1a">&#9670;&#160;</a></span>help_message</h2>
@@ -613,7 +626,7 @@ Variables</h2></td></tr>
 <b>Initial value:</b><div class="fragment"><div class="line">                    =</div>
 <div class="line"><span class="stringliteral">&quot;Available commands:\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  led_period &lt;ms&gt;               - Set the LED blink period in milliseconds\n&quot;</span></div>
-<div class="line"><span class="stringliteral">&quot;  set_stepper_period &lt;ms&gt;       - Set the stepper motor step period in milliseconds\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  set_stepper_period &lt;us&gt;       - Set the stepper motor step period in us\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  set_stepper_zero              - Set the current position to zero\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  move_stepper_absolute &lt;steps&gt; - Move the stepper to an absolute position\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  move_stepper_relative &lt;steps&gt; - Move the stepper by a relative number of steps\n&quot;</span></div>
@@ -659,7 +672,24 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Global millisecond ticks count. </p>
-<p>This variable is incremented by the millisecond timer callback and decremented in the main loop to track when the millisecond tasks should run. </p>
+<p>This variable is incremented by the timer callback every 100 calls (1 ms = 100 * 10 us) and decremented in the main loop to track when the millisecond tasks should run. </p>
+
+</div>
+</div>
+<a id="af1b4a703a8b19086cc80aaf5467052f7" name="af1b4a703a8b19086cc80aaf5467052f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1b4a703a8b19086cc80aaf5467052f7">&#9670;&#160;</a></span>ten_us_ticks_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">volatile int ten_us_ticks_count = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Global ten microsecond ticks count. </p>
+<p>This variable is incremented by the timer callback and decremented in the main loop to track when the ten microsecond tasks should run. </p>
 
 </div>
 </div>

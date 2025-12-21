@@ -17,17 +17,29 @@
 #include "pico/assert.h"
 #include <stdlib.h>
 #include "hardware/gpio.h"
+#include <ctype.h>
 
 // Define default LED delay if not defined
 #ifndef LED_DELAY_MS
 #define LED_DELAY_MS 1000
 #endif
 
-#define STEPPER_STEP_PIN    2 // GPIO pin for stepper step control
-#define STEPPER_DIR_PIN     3 // GPIO pin for stepper direction control
-#define STEPPER_ENABLE_PIN  4 // GPIO pin for stepper enable control
-#define STEPPER_DIRECTION_FORWARD 1
-#define STEPPER_DIRECTION_BACKWARD 0
+#define TIMER_INTERVAL_US              10       // Timer interval in microseconds
+#define DEFAULT_STEPPER_PERIOD          4       // Default step period in TIMER_INTERVAL_US units (4 * 10 us = 40 us = 25 kHz)
+#define MIN_STEPPER_PERIOD              4       // Minimum step period in TIMER_INTERVAL_US units (4 * 10 us = 40 us = 25 kHz)
+#define STEPPER_STEP_PIN                2       // GPIO pin for stepper step control
+#define STEPPER_DIR_PIN                 3       // GPIO pin for stepper direction control
+#define STEPPER_ENABLE_PIN              4       // GPIO pin for stepper enable control
+#define STEPPER_ENABLE_PIN_INVERTED     true    // Set to true if enable pin is active low
+#define STEPPER_DIRECTION_FORWARD       1
+#define STEPPER_DIRECTION_BACKWARD      0
+#define STEPPER_STEPS_PER_REV           3200    // Number of steps per revolution for the stepper motor
+                                                // 16 microsteps / 1.8 degree step angle * 360 degrees = 3200 steps
+#define STEPPER_MAX_REVOLUTIONS         15      // Maximum number of revolutions the stepper can move
+                                                // 20 TPI lead screw with 3/4 inch travel = 15 revolutions
+#define MAX_STEPPER_POSITION            (STEPPER_STEPS_PER_REV * STEPPER_MAX_REVOLUTIONS)
+#define MIN_STEPPER_POSITION            0
+
 
 /*!
  * @brief Structure to hold stepper motor state
@@ -36,7 +48,7 @@ typedef struct stepper_state
 {
     int current_position; //!< Current position in steps
     int target_position;  //!< Target position in steps
-    int step_period_ms;   //!< Step period in milliseconds
+    int step_period;      //!< Step period in TIMMER_INTERVAL_US units
     bool moving;          //!< Is the stepper currently moving
     bool enabled;         //!< Is the stepper enabled
 } stepper_state_t;
@@ -51,9 +63,17 @@ typedef struct stepper_state
 volatile int led_period = LED_DELAY_MS;
 
 /*! 
+ * @brief Global ten microsecond ticks count
+ *
+ * This variable is incremented by the timer callback
+ * and decremented in the main loop to track when the ten microsecond tasks should run.
+ */
+volatile int ten_us_ticks_count = 0;
+
+/*! 
  * @brief Global millisecond ticks count
  *
- * This variable is incremented by the millisecond timer callback
+ * This variable is incremented by the timer callback every 100 calls (1 ms = 100 * 10 us)
  * and decremented in the main loop to track when the millisecond tasks should run. 
  */
 
@@ -61,9 +81,7 @@ volatile int ms_ticks_count = 0;
 
 // Command definitions
 #define MAX_COMMAND_LENGTH              50
-#define MAX_STEPPER_POSITION            10000
-#define MIN_STEPPER_POSITION            0
-#define DEFAULT_STEPPER_PERIOD_MS       10
+
 #define LED_PERIOD_COMMAND              "led_period "
 #define SET_STEPPER_PERIOD_COMMAND      "set_stepper_period "
 #define SET_STEPPER_ZERO_COMMAND        "set_stepper_zero"
@@ -82,7 +100,7 @@ volatile int ms_ticks_count = 0;
 const char* help_message =
     "Available commands:\n"
     "  led_period <ms>               - Set the LED blink period in milliseconds\n"
-    "  set_stepper_period <ms>       - Set the stepper motor step period in milliseconds\n"
+    "  set_stepper_period <us>       - Set the stepper motor step period in us\n"
     "  set_stepper_zero              - Set the current position to zero\n"
     "  move_stepper_absolute <steps> - Move the stepper to an absolute position\n"
     "  move_stepper_relative <steps> - Move the stepper by a relative number of steps\n"
@@ -100,10 +118,10 @@ const char* help_message =
  *
  * @param stepper: pointer to stepper state structure to initialize, must not be NULL
  * @param initial_position: initial position in steps must be between MIN_STEPPER_POSITION and MAX_STEPPER_POSITION
- * @param step_period_ms: step period in milliseconds must be greater than 1 ms
+ * @param step_period: step period in TIMER_INTERVAL_US must be greater than 1 ms
  * @return: true on success, false on failure
  */
-bool stepper_init(stepper_state_t* stepper, int initial_position, int step_period_ms);
+bool stepper_init(stepper_state_t* stepper, int initial_position, int step_period);
 
 /*!
  * @brief Set the target position for the stepper motor
@@ -118,10 +136,10 @@ bool stepper_set_target_position(stepper_state_t* stepper, int target_position);
  * @brief Set the step period for the stepper motor
  *
  * @param stepper: pointer to stepper state structure, must not be NULL
- * @param step_period_ms: step period in milliseconds must be greater than 1 ms
+ * @param step_period: step period in microseconds must be greater than MIN_STEPPER_PERIOD
  * @return: true on success, false on failure
  */
-bool stepper_set_step_period(stepper_state_t* stepper, int step_period_ms);
+bool stepper_set_step_period(stepper_state_t* stepper, int step_period_us);
 
 /*!
  * @brief Stop the stepper motor, setting target position to current position
@@ -189,7 +207,7 @@ void process_led_tick(void);
  * @param t: pointer to repeating_timer struct
  * @return: true to keep repeating, false to stop
  */
-bool ms_timer_callback(struct repeating_timer *t);
+bool timer_callback(struct repeating_timer *t);
 
 /*!
  * @brief Process a command string
@@ -227,10 +245,10 @@ int main()
     int rc = pico_led_init();
     hard_assert(rc == PICO_OK);
     stdio_init_all();
-    stepper_init(&stepper, 0, DEFAULT_STEPPER_PERIOD_MS);
+    stepper_init(&stepper, 0, DEFAULT_STEPPER_PERIOD);
     
     // Set up repeating timer
-    struct repeating_timer ms_timer;
+    struct repeating_timer timer;
 
     // Wait for USB serial connection
     while (!stdio_usb_connected()) {
@@ -238,7 +256,7 @@ int main()
     }
 
     // Set up a repeating timer to count milliseconds
-    add_repeating_timer_ms(1, ms_timer_callback, NULL, &ms_timer);
+    add_repeating_timer_us(TIMER_INTERVAL_US, timer_callback, NULL, &timer);
 
     // Clear the screen and print welcome message 
     puts( "\033[2J" ); // Clear screen
@@ -269,6 +287,13 @@ int main()
                 printf("#: ");
                 cmd = NULL; // Clear command pointer, probably not necessary
             }
+
+            
+        }
+        if(ten_us_ticks_count > 0)
+        {
+            // Decrement the tick count
+            ten_us_ticks_count--;
 
             // Process stepper movement
             if(stepper.moving)
@@ -306,10 +331,17 @@ void pico_set_led(bool led_on)
 #endif
 }
 
-bool ms_timer_callback(struct repeating_timer *t)
+bool timer_callback(struct repeating_timer *t)
 {
-    // This function is called every millisecond
-    ms_ticks_count++;
+    static int us_count = 0;
+    // This function is called every 10 microseconds
+    us_count++;
+    if (us_count >= (1000 / TIMER_INTERVAL_US)) // 100 calls = 1 ms
+    {
+        us_count = 0;
+        ms_ticks_count++;
+    }
+    ten_us_ticks_count++;
     return true;    
 }
 
@@ -331,7 +363,7 @@ int process_command(const char* cmd, stepper_state_t* stepper)
         int new_step_period = atoi(cmd + strlen(SET_STEPPER_PERIOD_COMMAND));
         if(stepper_set_step_period(stepper, new_step_period))
         {
-            printf("Stepper step period set to %d ms\n", new_step_period);
+            printf("Stepper step period set to %d us\n", new_step_period);
         }
         else
         {
@@ -487,11 +519,16 @@ char* process_stdin_input(void)
             putchar(' ');
             putchar('\b');
         }
+
         // Echo the character and increment index
         else
         {
-            putchar(cmd_buffer[cmd_buffer_index]);
-            cmd_buffer_index++;
+            // Only accept printable characters
+            if((!iscntrl(cmd_buffer[cmd_buffer_index])) && (cmd_buffer[cmd_buffer_index] != '\b' && cmd_buffer[cmd_buffer_index] != 127))
+            {
+                putchar(cmd_buffer[cmd_buffer_index]);
+                cmd_buffer_index++;
+            }
         }
         
         // Prevent buffer overflow
@@ -514,7 +551,7 @@ char* process_stdin_input(void)
     return result;
 }
 
-bool stepper_init(stepper_state_t* stepper, int initial_position, int step_period_ms)
+bool stepper_init(stepper_state_t* stepper, int initial_position, int step_period)
 {
     if( stepper == NULL )
     {
@@ -526,16 +563,18 @@ bool stepper_init(stepper_state_t* stepper, int initial_position, int step_perio
         return false;
     } 
 
-    if( step_period_ms <= 1 )
+    if( step_period <= 1 )
     {
         return false;
     }
 
     stepper->current_position = initial_position;
     stepper->target_position = initial_position;
-    stepper->step_period_ms = step_period_ms;
+    stepper->step_period = step_period;
     stepper->moving = false;
     stepper->enabled = false;
+    stepper_enable(stepper, false); // Disable stepper motor initially
+    
     return true;
 }
 
@@ -556,19 +595,19 @@ bool stepper_set_target_position(stepper_state_t* stepper, int target_position)
     return true;
 }
 
-bool stepper_set_step_period(stepper_state_t* stepper, int step_period_ms)
+bool stepper_set_step_period(stepper_state_t* stepper, int step_period_us)
 {
     if( stepper == NULL )
     {
         return false;
     }
 
-    if( step_period_ms <= 1 )
+    if( step_period_us < (MIN_STEPPER_PERIOD * TIMER_INTERVAL_US) )
     {
         return false;
     }
 
-    stepper->step_period_ms = step_period_ms;
+    stepper->step_period = step_period_us / TIMER_INTERVAL_US;
     return true;
 }
 
@@ -594,7 +633,7 @@ bool stepper_get_status(stepper_state_t* stepper)
     printf("Stepper Status:\n");
     printf("  Current Position: %d\n", stepper->current_position);
     printf("  Target Position: %d\n", stepper->target_position);
-    printf("  Step Period (ms): %d\n", stepper->step_period_ms);
+    printf("  Step Period (us): %d\n", stepper->step_period * TIMER_INTERVAL_US);
     printf("  Moving: %s\n", stepper->moving ? "Yes" : "No");
     printf("  Enabled: %s\n", stepper->enabled ? "Yes" : "No");
     return true;
@@ -615,7 +654,7 @@ bool stepper_enable(stepper_state_t* stepper, bool enable)
         return false;
     }
 
-    gpio_put(STEPPER_ENABLE_PIN, enable ? 1 : 0); // Enable or disable the stepper motor
+    gpio_put(STEPPER_ENABLE_PIN, enable ? (1 ^ STEPPER_ENABLE_PIN_INVERTED) : (0 ^ STEPPER_ENABLE_PIN_INVERTED)); // Enable or disable the stepper motor
     stepper->enabled = enable;
     return true;
 }
@@ -664,12 +703,12 @@ bool process_stepper_movement(stepper_state_t* stepper)
         // Increment step timer
         step_timer++;
 
-        if( step_timer == stepper->step_period_ms/2 )
+        if( step_timer == stepper->step_period/2 )
         {
             // set step pin high
             gpio_put(STEPPER_STEP_PIN, 1);
         }
-        else if( step_timer >= stepper->step_period_ms )
+        else if( step_timer >= stepper->step_period )
         {
             // set step pin low
             gpio_put(STEPPER_STEP_PIN, 0);
@@ -688,7 +727,7 @@ bool process_stepper_movement(stepper_state_t* stepper)
             if( stepper->current_position == stepper->target_position )
             {
                 stepper->moving = false;
-                printf("\nStepper reached target position: %d\n", stepper->current_position);
+                //printf("\nStepper reached target position: %d\n", stepper->current_position);
             }
         }
     }

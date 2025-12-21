@@ -3,7 +3,7 @@ var indexSectionsWithContent =
   0: "cehlmpst",
   1: "s",
   2: "c",
-  3: "mps",
+  3: "mpst",
   4: "cehlmst",
   5: "c"
 };
