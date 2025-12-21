@@ -36,8 +36,9 @@
 #define STEPPER_DIRECTION_BACKWARD      0
 #define STEPPER_STEPS_PER_REV           3200    // Number of steps per revolution for the stepper motor
                                                 // 16 microsteps / 1.8 degree step angle * 360 degrees = 3200 steps
-#define STEPPER_MAX_REVOLUTIONS         15      // Maximum number of revolutions the stepper can move
+#define STEPPER_MAX_REVOLUTIONS         12      // Maximum number of revolutions the stepper can move
                                                 // 20 TPI lead screw with 3/4 inch travel = 15 revolutions
+#define STEPPER_BUMP_STEPS              (STEPPER_STEPS_PER_REV / 4) // Number of steps to move for a bump down command (1/4 revolution)
 #define MAX_STEPPER_POSITION            (STEPPER_STEPS_PER_REV * STEPPER_MAX_REVOLUTIONS)
 #define MIN_STEPPER_POSITION            0
 
@@ -83,12 +84,14 @@ volatile int ms_ticks_count = 0;
 // Command definitions
 #define MAX_COMMAND_LENGTH              50
 
+#define CLAW_SET_POSITION_COMMAND       "claw_set "
 #define LED_PERIOD_COMMAND              "led_period "
 #define SET_STEPPER_PERIOD_COMMAND      "set_stepper_period "
 #define SET_STEPPER_ZERO_COMMAND        "set_stepper_zero"
 #define MOVE_STEPPER_ABSOLUTE_COMMAND   "move_stepper_absolute "
 #define MOVE_STEPPER_RELATIVE_COMMAND   "move_stepper_relative "
 #define MOVE_STEPPER_ROTATIONS_COMMAND  "move_stepper_rotations "
+#define MOVE_STEPPER_BUMP_DOWN_COMMAND  "move_stepper_bump_down"
 #define STOP_STEPPER_COMMAND            "stop_stepper"
 #define GET_STEPPER_STATUS_COMMAND      "get_stepper_status"
 #define ENABLE_STEPPER_COMMAND          "enable_stepper"
@@ -102,12 +105,14 @@ volatile int ms_ticks_count = 0;
 const char* help_message =
     "\n"
     "Available commands:\n"
+    "  claw_set <position>                - Set the claw position 0 to 100\n"
     "  led_period <ms>                    - Set the LED blink period in milliseconds\n"
     "  set_stepper_period <us>            - Set the stepper motor step period in us\n"
     "  set_stepper_zero                   - Set the current position to zero\n"
     "  move_stepper_absolute <steps>      - Move the stepper to an absolute position\n"
     "  move_stepper_relative <steps>      - Move the stepper by a relative number of steps\n"
     "  move_stepper_rotations <rotations> - Move the stepper by a number of rotations\n"
+    "  move_stepper_bump_down             - Move the stepper down by a small fixed amount\n"
     "  stop_stepper                       - Stop the stepper motor\n"
     "  get_stepper_status                 - Get the current status of the stepper motor\n"
     "  enable_stepper                     - Enable the stepper motor\n"
@@ -351,8 +356,32 @@ bool timer_callback(struct repeating_timer *t)
 
 int process_command(const char* cmd, stepper_state_t* stepper)
 {
+    // claw set position command
+    if (strncmp(cmd, CLAW_SET_POSITION_COMMAND, strlen(CLAW_SET_POSITION_COMMAND)) == 0) 
+    {
+        float position = atof(cmd + strlen(CLAW_SET_POSITION_COMMAND));
+
+        // Check if stepper is enabled
+        if(stepper->enabled == false)
+        {
+            printf("Error: Stepper motor is disabled. Enable it first.\n");
+        }
+        // Check for valid position
+        else if (position < 0 || position > 100)
+        {
+            printf("Error: Claw position must be between 0 and 100\n");
+        }
+        // Set the target position as a percentage of max stepper position
+        else
+        {
+            int new_stepper_position = (int)round((position * MAX_STEPPER_POSITION) / 100.0);
+            stepper_set_target_position(stepper, new_stepper_position);
+            stepper->moving = true; // Start moving
+            printf("Claw position set to %.2f%% (%d)\n", position, new_stepper_position);
+        }
+    }  
     // command to set LED period
-    if (strncmp(cmd, LED_PERIOD_COMMAND, strlen(LED_PERIOD_COMMAND)) == 0) 
+    else if (strncmp(cmd, LED_PERIOD_COMMAND, strlen(LED_PERIOD_COMMAND)) == 0) 
     {
         int new_period = atoi(cmd + strlen(LED_PERIOD_COMMAND));
         if (new_period > 0) 
@@ -441,7 +470,29 @@ int process_command(const char* cmd, stepper_state_t* stepper)
             printf("Error: Invalid target position\n");
         }
     }
-
+    // command to bump stepper down by fixed amount
+    else if(strncmp(cmd, MOVE_STEPPER_BUMP_DOWN_COMMAND, strlen(MOVE_STEPPER_BUMP_DOWN_COMMAND)) == 0)
+    {
+        if(stepper->enabled == false)
+        {
+            printf("Error: Stepper motor is disabled. Enable it first.\n");
+        }
+        // Check if bump down is within current limits
+        else if(stepper->current_position > STEPPER_BUMP_STEPS)
+        {
+            printf("Bumping stepper down by %d steps\n", STEPPER_BUMP_STEPS);
+            stepper->target_position = stepper->current_position - STEPPER_BUMP_STEPS; //
+            stepper->moving = true;
+        }
+        // If bump down exceeds minimum position, reset to allow bump
+        else
+        {
+            printf("Bump down exceeds minimum position, resetting zero to allow bump\n");
+            stepper->current_position = STEPPER_BUMP_STEPS;  // Set current position to allow bump down
+            stepper->target_position = 0; // Set target position to zero
+            stepper->moving = true;
+        }
+    }
     // command to stop stepper
     else if(strncmp(cmd, STOP_STEPPER_COMMAND, strlen(STOP_STEPPER_COMMAND)) == 0)
     {
@@ -482,7 +533,7 @@ int process_command(const char* cmd, stepper_state_t* stepper)
     // unknown command
     else 
     {
-        printf("Unknown command: %s\n-----\n", cmd);
+        printf("Unknown command: \"%s\"\n-----\n", cmd);
         printf("%s", help_message);
     }
     return 0;

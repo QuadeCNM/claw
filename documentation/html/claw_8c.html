@@ -134,13 +134,17 @@ Macros</h2></td></tr>
 <tr class="memitem:af11c1828b48836b1e853be80f0819bf4" id="r_af11c1828b48836b1e853be80f0819bf4"><td class="memItemLeft"><a id="af11c1828b48836b1e853be80f0819bf4" name="af11c1828b48836b1e853be80f0819bf4"></a>
 #define&#160;</td><td class="memItemRight"><b>STEPPER_STEPS_PER_REV</b>&#160;&#160;&#160;3200</td></tr>
 <tr class="memitem:ae6448262632923d788fc0e8797deca2c" id="r_ae6448262632923d788fc0e8797deca2c"><td class="memItemLeft"><a id="ae6448262632923d788fc0e8797deca2c" name="ae6448262632923d788fc0e8797deca2c"></a>
-#define&#160;</td><td class="memItemRight"><b>STEPPER_MAX_REVOLUTIONS</b>&#160;&#160;&#160;15</td></tr>
+#define&#160;</td><td class="memItemRight"><b>STEPPER_MAX_REVOLUTIONS</b>&#160;&#160;&#160;12</td></tr>
+<tr class="memitem:ab55c9ea0497ea2bd8032765211d8bab7" id="r_ab55c9ea0497ea2bd8032765211d8bab7"><td class="memItemLeft"><a id="ab55c9ea0497ea2bd8032765211d8bab7" name="ab55c9ea0497ea2bd8032765211d8bab7"></a>
+#define&#160;</td><td class="memItemRight"><b>STEPPER_BUMP_STEPS</b>&#160;&#160;&#160;(STEPPER_STEPS_PER_REV / 4)</td></tr>
 <tr class="memitem:a900cc1b2df4d55d6a5cc87f5f80f82c7" id="r_a900cc1b2df4d55d6a5cc87f5f80f82c7"><td class="memItemLeft"><a id="a900cc1b2df4d55d6a5cc87f5f80f82c7" name="a900cc1b2df4d55d6a5cc87f5f80f82c7"></a>
 #define&#160;</td><td class="memItemRight"><b>MAX_STEPPER_POSITION</b>&#160;&#160;&#160;(STEPPER_STEPS_PER_REV * STEPPER_MAX_REVOLUTIONS)</td></tr>
 <tr class="memitem:ac55adc9cd2519e117a51e8df7dad3fb2" id="r_ac55adc9cd2519e117a51e8df7dad3fb2"><td class="memItemLeft"><a id="ac55adc9cd2519e117a51e8df7dad3fb2" name="ac55adc9cd2519e117a51e8df7dad3fb2"></a>
 #define&#160;</td><td class="memItemRight"><b>MIN_STEPPER_POSITION</b>&#160;&#160;&#160;0</td></tr>
 <tr class="memitem:af1abcb51a4aa27a5a5a7958c03448134" id="r_af1abcb51a4aa27a5a5a7958c03448134"><td class="memItemLeft"><a id="af1abcb51a4aa27a5a5a7958c03448134" name="af1abcb51a4aa27a5a5a7958c03448134"></a>
 #define&#160;</td><td class="memItemRight"><b>MAX_COMMAND_LENGTH</b>&#160;&#160;&#160;50</td></tr>
+<tr class="memitem:a749814a37790de9ebfd45aeb2eb74e1c" id="r_a749814a37790de9ebfd45aeb2eb74e1c"><td class="memItemLeft"><a id="a749814a37790de9ebfd45aeb2eb74e1c" name="a749814a37790de9ebfd45aeb2eb74e1c"></a>
+#define&#160;</td><td class="memItemRight"><b>CLAW_SET_POSITION_COMMAND</b>&#160;&#160;&#160;&quot;claw_set &quot;</td></tr>
 <tr class="memitem:a7e07526817a0df66d8c7804f10a3e1bf" id="r_a7e07526817a0df66d8c7804f10a3e1bf"><td class="memItemLeft"><a id="a7e07526817a0df66d8c7804f10a3e1bf" name="a7e07526817a0df66d8c7804f10a3e1bf"></a>
 #define&#160;</td><td class="memItemRight"><b>LED_PERIOD_COMMAND</b>&#160;&#160;&#160;&quot;led_period &quot;</td></tr>
 <tr class="memitem:a7011561f508dcf43e5caf02a250374c2" id="r_a7011561f508dcf43e5caf02a250374c2"><td class="memItemLeft"><a id="a7011561f508dcf43e5caf02a250374c2" name="a7011561f508dcf43e5caf02a250374c2"></a>
@@ -153,6 +157,8 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight"><b>MOVE_STEPPER_RELATIVE_COMMAND</b>&#160;&#160;&#160;&quot;move_stepper_relative &quot;</td></tr>
 <tr class="memitem:a337c2441fcc5007766b9fd0cd07eedad" id="r_a337c2441fcc5007766b9fd0cd07eedad"><td class="memItemLeft"><a id="a337c2441fcc5007766b9fd0cd07eedad" name="a337c2441fcc5007766b9fd0cd07eedad"></a>
 #define&#160;</td><td class="memItemRight"><b>MOVE_STEPPER_ROTATIONS_COMMAND</b>&#160;&#160;&#160;&quot;move_stepper_rotations &quot;</td></tr>
+<tr class="memitem:a7bc71a6dbe12752396f76ddba118361a" id="r_a7bc71a6dbe12752396f76ddba118361a"><td class="memItemLeft"><a id="a7bc71a6dbe12752396f76ddba118361a" name="a7bc71a6dbe12752396f76ddba118361a"></a>
+#define&#160;</td><td class="memItemRight"><b>MOVE_STEPPER_BUMP_DOWN_COMMAND</b>&#160;&#160;&#160;&quot;move_stepper_bump_down&quot;</td></tr>
 <tr class="memitem:aff9f5c0a44d1b386918d1ab242b78341" id="r_aff9f5c0a44d1b386918d1ab242b78341"><td class="memItemLeft"><a id="aff9f5c0a44d1b386918d1ab242b78341" name="aff9f5c0a44d1b386918d1ab242b78341"></a>
 #define&#160;</td><td class="memItemRight"><b>STOP_STEPPER_COMMAND</b>&#160;&#160;&#160;&quot;stop_stepper&quot;</td></tr>
 <tr class="memitem:a50107101d35084c8eff46d90af286a01" id="r_a50107101d35084c8eff46d90af286a01"><td class="memItemLeft"><a id="a50107101d35084c8eff46d90af286a01" name="a50107101d35084c8eff46d90af286a01"></a>
@@ -629,12 +635,14 @@ Variables</h2></td></tr>
 <b>Initial value:</b><div class="fragment"><div class="line">                    =</div>
 <div class="line"><span class="stringliteral">&quot;\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;Available commands:\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  claw_set &lt;position&gt;                - Set the claw position 0 to 100\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  led_period &lt;ms&gt;                    - Set the LED blink period in milliseconds\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  set_stepper_period &lt;us&gt;            - Set the stepper motor step period in us\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  set_stepper_zero                   - Set the current position to zero\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  move_stepper_absolute &lt;steps&gt;      - Move the stepper to an absolute position\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  move_stepper_relative &lt;steps&gt;      - Move the stepper by a relative number of steps\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  move_stepper_rotations &lt;rotations&gt; - Move the stepper by a number of rotations\n&quot;</span></div>
+<div class="line"><span class="stringliteral">&quot;  move_stepper_bump_down             - Move the stepper down by a small fixed amount\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  stop_stepper                       - Stop the stepper motor\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  get_stepper_status                 - Get the current status of the stepper motor\n&quot;</span></div>
 <div class="line"><span class="stringliteral">&quot;  enable_stepper                     - Enable the stepper motor\n&quot;</span></div>
