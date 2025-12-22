@@ -1,4 +1,13 @@
 var searchData=
 [
-  ['main_0',['main',['../claw_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'claw.c']]]
+  ['command_5fclaw_5fset_5fposition_0',['command_claw_set_position',['../claw_8c.html#a5b2d43a10ae57a5deebda4f3c5b7d154',1,'claw.c']]],
+  ['command_5fget_5fstepper_5fstatus_1',['command_get_stepper_status',['../claw_8c.html#aeecf38a2babf080abfeba6a9a8be07e7',1,'claw.c']]],
+  ['command_5fmove_5fstepper_5fabsolute_2',['command_move_stepper_absolute',['../claw_8c.html#a1553f9ea2b56c134a846fdc1de5fa4af',1,'claw.c']]],
+  ['command_5fmove_5fstepper_5fbump_5fdown_3',['command_move_stepper_bump_down',['../claw_8c.html#ad6ccbb815b5fb68428a4295057978c84',1,'claw.c']]],
+  ['command_5fmove_5fstepper_5frelative_4',['command_move_stepper_relative',['../claw_8c.html#a4a263a163e903e9d6d145efdab73ef2a',1,'claw.c']]],
+  ['command_5fmove_5fstepper_5frotations_5',['command_move_stepper_rotations',['../claw_8c.html#a464edc31150d224bb2e5b2677e83e36d',1,'claw.c']]],
+  ['command_5fset_5fled_5fperiod_6',['command_set_led_period',['../claw_8c.html#a57d3eb41c21eca1aa8d80347168e3fd2',1,'claw.c']]],
+  ['command_5fset_5fstepper_5fperiod_7',['command_set_stepper_period',['../claw_8c.html#a14d08202159ad556bd112de6cd9e9e96',1,'claw.c']]],
+  ['command_5fset_5fstepper_5fzero_8',['command_set_stepper_zero',['../claw_8c.html#af94654c3bdeec030862859729dafd127',1,'claw.c']]],
+  ['command_5fstop_5fstepper_9',['command_stop_stepper',['../claw_8c.html#a7e81b537715fa4d2d66f1abd426b9ae8',1,'claw.c']]]
 ];

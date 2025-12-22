@@ -183,8 +183,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:a9ba0584cb9ff909bdc1307b5bc78860c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the step period for the stepper motor.  <br /></td></tr>
 <tr class="memitem:a2618732501f937687962beecaedfe2f4" id="r_a2618732501f937687962beecaedfe2f4"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a2618732501f937687962beecaedfe2f4">stepper_stop</a> (stepper_state_t *stepper)</td></tr>
 <tr class="memdesc:a2618732501f937687962beecaedfe2f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop the stepper motor, setting target position to current position.  <br /></td></tr>
-<tr class="memitem:a51e4183c1284ad57bb958432b9198074" id="r_a51e4183c1284ad57bb958432b9198074"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a51e4183c1284ad57bb958432b9198074">stepper_get_status</a> (stepper_state_t *stepper)</td></tr>
-<tr class="memdesc:a51e4183c1284ad57bb958432b9198074"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current status of the stepper motor, printing to stdout.  <br /></td></tr>
 <tr class="memitem:a3d6f069e05a71350694c2df3e16afb2c" id="r_a3d6f069e05a71350694c2df3e16afb2c"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a3d6f069e05a71350694c2df3e16afb2c">stepper_enable</a> (stepper_state_t *stepper, bool enable)</td></tr>
 <tr class="memdesc:a3d6f069e05a71350694c2df3e16afb2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the stepper motor.  <br /></td></tr>
 <tr class="memitem:a8fb03d5c2bab0e7314cb7ae54aa71506" id="r_a8fb03d5c2bab0e7314cb7ae54aa71506"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a8fb03d5c2bab0e7314cb7ae54aa71506">pico_led_init</a> (void)</td></tr>
@@ -197,10 +195,30 @@ Functions</h2></td></tr>
 <tr class="memdesc:a188c27cc34240da2d8de48c84d9ab13c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process LED timing tick.  <br /></td></tr>
 <tr class="memitem:a9c64a585f107e6322134ec3e4d9caed0" id="r_a9c64a585f107e6322134ec3e4d9caed0"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a9c64a585f107e6322134ec3e4d9caed0">timer_callback</a> (struct repeating_timer *t)</td></tr>
 <tr class="memdesc:a9c64a585f107e6322134ec3e4d9caed0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Millisecond timer callback.  <br /></td></tr>
-<tr class="memitem:acb6560289999406da7438c797fd298d2" id="r_acb6560289999406da7438c797fd298d2"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#acb6560289999406da7438c797fd298d2">process_command</a> (const char *cmd, stepper_state_t *stepper)</td></tr>
-<tr class="memdesc:acb6560289999406da7438c797fd298d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a command string.  <br /></td></tr>
+<tr class="memitem:aeac5e3d1d400d50e808464e642c50e93" id="r_aeac5e3d1d400d50e808464e642c50e93"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#aeac5e3d1d400d50e808464e642c50e93">process_command</a> (const char *cmd, stepper_state_t *stepper)</td></tr>
+<tr class="memdesc:aeac5e3d1d400d50e808464e642c50e93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a command string.  <br /></td></tr>
 <tr class="memitem:adb12b21353b01db540ea04071a5bfd67" id="r_adb12b21353b01db540ea04071a5bfd67"><td class="memItemLeft">char *&#160;</td><td class="memItemRight"><a class="el" href="#adb12b21353b01db540ea04071a5bfd67">process_stdin_input</a> (void)</td></tr>
 <tr class="memdesc:adb12b21353b01db540ea04071a5bfd67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process stdin input.  <br /></td></tr>
+<tr class="memitem:a5b2d43a10ae57a5deebda4f3c5b7d154" id="r_a5b2d43a10ae57a5deebda4f3c5b7d154"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a5b2d43a10ae57a5deebda4f3c5b7d154">command_claw_set_position</a> (stepper_state_t *stepper, const char *cmd)</td></tr>
+<tr class="memdesc:a5b2d43a10ae57a5deebda4f3c5b7d154"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to set claw position.  <br /></td></tr>
+<tr class="memitem:a57d3eb41c21eca1aa8d80347168e3fd2" id="r_a57d3eb41c21eca1aa8d80347168e3fd2"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a57d3eb41c21eca1aa8d80347168e3fd2">command_set_led_period</a> (const char *cmd)</td></tr>
+<tr class="memdesc:a57d3eb41c21eca1aa8d80347168e3fd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to set LED period.  <br /></td></tr>
+<tr class="memitem:a14d08202159ad556bd112de6cd9e9e96" id="r_a14d08202159ad556bd112de6cd9e9e96"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a14d08202159ad556bd112de6cd9e9e96">command_set_stepper_period</a> (stepper_state_t *stepper, const char *cmd)</td></tr>
+<tr class="memdesc:a14d08202159ad556bd112de6cd9e9e96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to set stepper period.  <br /></td></tr>
+<tr class="memitem:af94654c3bdeec030862859729dafd127" id="r_af94654c3bdeec030862859729dafd127"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#af94654c3bdeec030862859729dafd127">command_set_stepper_zero</a> (stepper_state_t *stepper)</td></tr>
+<tr class="memdesc:af94654c3bdeec030862859729dafd127"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to set stepper position to zero.  <br /></td></tr>
+<tr class="memitem:a1553f9ea2b56c134a846fdc1de5fa4af" id="r_a1553f9ea2b56c134a846fdc1de5fa4af"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a1553f9ea2b56c134a846fdc1de5fa4af">command_move_stepper_absolute</a> (stepper_state_t *stepper, const char *cmd)</td></tr>
+<tr class="memdesc:a1553f9ea2b56c134a846fdc1de5fa4af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to move stepper to an absolute position.  <br /></td></tr>
+<tr class="memitem:a4a263a163e903e9d6d145efdab73ef2a" id="r_a4a263a163e903e9d6d145efdab73ef2a"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a4a263a163e903e9d6d145efdab73ef2a">command_move_stepper_relative</a> (stepper_state_t *stepper, const char *cmd)</td></tr>
+<tr class="memdesc:a4a263a163e903e9d6d145efdab73ef2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to move stepper by a relative amount.  <br /></td></tr>
+<tr class="memitem:a464edc31150d224bb2e5b2677e83e36d" id="r_a464edc31150d224bb2e5b2677e83e36d"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a464edc31150d224bb2e5b2677e83e36d">command_move_stepper_rotations</a> (stepper_state_t *stepper, const char *cmd)</td></tr>
+<tr class="memdesc:a464edc31150d224bb2e5b2677e83e36d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to move stepper by a relative amount.  <br /></td></tr>
+<tr class="memitem:ad6ccbb815b5fb68428a4295057978c84" id="r_ad6ccbb815b5fb68428a4295057978c84"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#ad6ccbb815b5fb68428a4295057978c84">command_move_stepper_bump_down</a> (stepper_state_t *stepper)</td></tr>
+<tr class="memdesc:ad6ccbb815b5fb68428a4295057978c84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to move stepper by a relative amount.  <br /></td></tr>
+<tr class="memitem:a7e81b537715fa4d2d66f1abd426b9ae8" id="r_a7e81b537715fa4d2d66f1abd426b9ae8"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a7e81b537715fa4d2d66f1abd426b9ae8">command_stop_stepper</a> (stepper_state_t *stepper)</td></tr>
+<tr class="memdesc:a7e81b537715fa4d2d66f1abd426b9ae8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to stop stepper movement.  <br /></td></tr>
+<tr class="memitem:aeecf38a2babf080abfeba6a9a8be07e7" id="r_aeecf38a2babf080abfeba6a9a8be07e7"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#aeecf38a2babf080abfeba6a9a8be07e7">command_get_stepper_status</a> (stepper_state_t *stepper)</td></tr>
+<tr class="memdesc:aeecf38a2babf080abfeba6a9a8be07e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to get stepper status.  <br /></td></tr>
 <tr class="memitem:ae66f6b31b5ad750f1fe042a706a4e3d4" id="r_ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#ae66f6b31b5ad750f1fe042a706a4e3d4">main</a> ()</td></tr>
 <tr class="memdesc:ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main function.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -222,6 +240,297 @@ Variables</h2></td></tr>
 <dl class="section copyright"><dt>Copyright</dt><dd>(c) 2025 Jon Wade. Standard MIT License applies. See LICENSE file.</dd></dl>
 <p>Command interface for controlling stepper motors and other functions associated with the claw device. This file implements a simple command interface over USB serial to control the claw device. </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a5b2d43a10ae57a5deebda4f3c5b7d154" name="a5b2d43a10ae57a5deebda4f3c5b7d154"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b2d43a10ae57a5deebda4f3c5b7d154">&#9670;&#160;</a></span>command_claw_set_position()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_claw_set_position </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to set claw position. </p>
+<dl class="section note"><dt>Note</dt><dd>: Function is not completely safe, assumes valid command string</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+    <tr><td class="paramname">cmd</td><td>pointer to command string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="aeecf38a2babf080abfeba6a9a8be07e7" name="aeecf38a2babf080abfeba6a9a8be07e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeecf38a2babf080abfeba6a9a8be07e7">&#9670;&#160;</a></span>command_get_stepper_status()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_get_stepper_status </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to get stepper status. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="a1553f9ea2b56c134a846fdc1de5fa4af" name="a1553f9ea2b56c134a846fdc1de5fa4af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1553f9ea2b56c134a846fdc1de5fa4af">&#9670;&#160;</a></span>command_move_stepper_absolute()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_move_stepper_absolute </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to move stepper to an absolute position. </p>
+<dl class="section note"><dt>Note</dt><dd>: Function is not completely safe, assumes valid command string</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+    <tr><td class="paramname">cmd</td><td>pointer to command string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="ad6ccbb815b5fb68428a4295057978c84" name="ad6ccbb815b5fb68428a4295057978c84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6ccbb815b5fb68428a4295057978c84">&#9670;&#160;</a></span>command_move_stepper_bump_down()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_move_stepper_bump_down </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to move stepper by a relative amount. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="a4a263a163e903e9d6d145efdab73ef2a" name="a4a263a163e903e9d6d145efdab73ef2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a263a163e903e9d6d145efdab73ef2a">&#9670;&#160;</a></span>command_move_stepper_relative()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_move_stepper_relative </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to move stepper by a relative amount. </p>
+<dl class="section note"><dt>Note</dt><dd>: Function is not completely safe, assumes valid command string</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+    <tr><td class="paramname">cmd</td><td>pointer to command string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="a464edc31150d224bb2e5b2677e83e36d" name="a464edc31150d224bb2e5b2677e83e36d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a464edc31150d224bb2e5b2677e83e36d">&#9670;&#160;</a></span>command_move_stepper_rotations()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_move_stepper_rotations </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to move stepper by a relative amount. </p>
+<dl class="section note"><dt>Note</dt><dd>: Function is not completely safe, assumes valid command string</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+    <tr><td class="paramname">cmd</td><td>pointer to command string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="a57d3eb41c21eca1aa8d80347168e3fd2" name="a57d3eb41c21eca1aa8d80347168e3fd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57d3eb41c21eca1aa8d80347168e3fd2">&#9670;&#160;</a></span>command_set_led_period()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_set_led_period </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to set LED period. </p>
+<dl class="section note"><dt>Note</dt><dd>: Function is not completely safe, assumes valid command string</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cmd</td><td>pointer to command string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="a14d08202159ad556bd112de6cd9e9e96" name="a14d08202159ad556bd112de6cd9e9e96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14d08202159ad556bd112de6cd9e9e96">&#9670;&#160;</a></span>command_set_stepper_period()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_set_stepper_period </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to set stepper period. </p>
+<dl class="section note"><dt>Note</dt><dd>: Function is not completely safe, assumes valid command string</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+    <tr><td class="paramname">cmd</td><td>pointer to command string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="af94654c3bdeec030862859729dafd127" name="af94654c3bdeec030862859729dafd127"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af94654c3bdeec030862859729dafd127">&#9670;&#160;</a></span>command_set_stepper_zero()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_set_stepper_zero </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to set stepper position to zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="a7e81b537715fa4d2d66f1abd426b9ae8" name="a7e81b537715fa4d2d66f1abd426b9ae8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e81b537715fa4d2d66f1abd426b9ae8">&#9670;&#160;</a></span>command_stop_stepper()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_stop_stepper </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to stop stepper movement. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
 <a id="ae66f6b31b5ad750f1fe042a706a4e3d4" name="ae66f6b31b5ad750f1fe042a706a4e3d4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae66f6b31b5ad750f1fe042a706a4e3d4">&#9670;&#160;</a></span>main()</h2>
 
@@ -270,7 +579,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>: PICO_OK on success error code on failure </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>: PICO_OK on success, error code on failure </dd></dl>
 
 </div>
 </div>
@@ -300,14 +609,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="acb6560289999406da7438c797fd298d2" name="acb6560289999406da7438c797fd298d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb6560289999406da7438c797fd298d2">&#9670;&#160;</a></span>process_command()</h2>
+<a id="aeac5e3d1d400d50e808464e642c50e93" name="aeac5e3d1d400d50e808464e642c50e93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeac5e3d1d400d50e808464e642c50e93">&#9670;&#160;</a></span>process_command()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int process_command </td>
+          <td class="memname">bool process_command </td>
           <td>(</td>
           <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span>, </td>
         </tr>
@@ -320,6 +629,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Process a command string. </p>
+<dl class="section note"><dt>Note</dt><dd>: This function parses the command string and calls the appropriate command helper function. It checks for null pointers and command length.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">cmd</td><td>pointer to command string </td></tr>
@@ -327,7 +637,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>: 0 on success, error code on failure </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
 
 </div>
 </div>
@@ -373,7 +683,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Process stdin input. </p>
-<dl class="section note"><dt>Note</dt><dd>: This function reads characters from stdin, builds commands, and processes them when a newline is received.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>: This function reads characters from stdin, builds commands, and returns complete command strings.</dd></dl>
 <p>This function has a simple lock to prevent re-entrancy.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -381,7 +691,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>: none </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>: non-null pointer to command string when a complete command is received, </dd></dl>
 
 </div>
 </div>
@@ -435,32 +745,6 @@ Variables</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">stepper</td><td>pointer to stepper state structure, must not be NULL </td></tr>
     <tr><td class="paramname">enable</td><td>true to enable, false to disable </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
-
-</div>
-</div>
-<a id="a51e4183c1284ad57bb958432b9198074" name="a51e4183c1284ad57bb958432b9198074"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51e4183c1284ad57bb958432b9198074">&#9670;&#160;</a></span>stepper_get_status()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool stepper_get_status </td>
-          <td>(</td>
-          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the current status of the stepper motor, printing to stdout. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure, must not be NULL </td></tr>
   </table>
   </dd>
 </dl>

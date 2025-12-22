@@ -159,14 +159,6 @@ bool stepper_set_step_period(stepper_state_t* stepper, int step_period_us);
 bool stepper_stop(stepper_state_t* stepper);
 
 /*!
- * @brief Get the current status of the stepper motor, printing to stdout
- *
- * @param stepper: pointer to stepper state structure, must not be NULL
- * @return: true on success, false on failure
- */
-bool stepper_get_status(stepper_state_t* stepper);
-
-/*!
  * @brief Enable the stepper motor
  *
  * @param stepper: pointer to stepper state structure, must not be NULL
@@ -179,8 +171,7 @@ bool stepper_enable(stepper_state_t* stepper, bool enable);
  * @brief Initialise the LED
  *
  * @param: none
- * @return: PICO_OK on success
-            error code on failure
+ * @return: PICO_OK on success, error code on failure
  */
 int pico_led_init(void);
 
@@ -221,24 +212,124 @@ bool timer_callback(struct repeating_timer *t);
 /*!
  * @brief Process a command string
  *
+ * @note: This function parses the command string and calls the appropriate command helper function.
+ *        It checks for null pointers and command length.
+ * 
  * @param cmd: pointer to command string
  * @param stepper: pointer to stepper state structure
- * @return: 0 on success, error code on failure
+ * @return: true on success, false on failure
  */
-int process_command(const char* cmd, stepper_state_t* stepper);
+bool process_command(const char* cmd, stepper_state_t* stepper);
 
 /*!
  * @brief Process stdin input
  *
  * @note: This function reads characters from stdin,
- *        builds commands, and processes them when a newline is received.
+ *        builds commands, and returns complete command strings.
  *
  *        This function has a simple lock to prevent re-entrancy.
  *
  * @param: none
- * @return: none
+ * @return: non-null pointer to command string when a complete command is received,
  */
 char* process_stdin_input(void);
+
+/*!
+ * @brief Command helper function to set claw position
+ *
+ * @note: Function is not completely safe, assumes valid command string
+ *
+ * @param stepper: pointer to stepper state structure
+ * @param cmd: pointer to command string
+ * @return: true on success, false on failure
+ */
+bool command_claw_set_position(stepper_state_t* stepper, const char* cmd);
+
+/*!
+ * @brief Command helper function to set LED period
+ *
+ * @note: Function is not completely safe, assumes valid command string
+ *
+ * @param cmd: pointer to command string
+ * @return: true on success, false on failure
+ */
+bool command_set_led_period(const char* cmd);
+
+/*!
+ * @brief Command helper function to set stepper period
+ *
+ * @note: Function is not completely safe, assumes valid command string
+ *
+ * @param stepper: pointer to stepper state structure
+ * @param cmd: pointer to command string
+ * @return: true on success, false on failure
+ */
+bool command_set_stepper_period(stepper_state_t* stepper, const char* cmd);
+
+/*!
+ * @brief Command helper function to set stepper position to zero
+ *
+ * @param stepper: pointer to stepper state structure
+ * @return: true on success, false on failure
+ */
+bool command_set_stepper_zero(stepper_state_t* stepper);
+
+/*!
+ * @brief Command helper function to move stepper to an absolute position
+ *
+ * @note: Function is not completely safe, assumes valid command string
+ *
+ * @param stepper: pointer to stepper state structure
+ * @param cmd: pointer to command string
+ * @return: true on success, false on failure
+ */
+bool command_move_stepper_absolute(stepper_state_t* stepper, const char* cmd);
+
+/*!
+ * @brief Command helper function to move stepper by a relative amount
+ *
+ * @note: Function is not completely safe, assumes valid command string
+ *
+ * @param stepper: pointer to stepper state structure
+ * @param cmd: pointer to command string
+ * @return: true on success, false on failure
+ */
+bool command_move_stepper_relative(stepper_state_t* stepper, const char* cmd);
+
+/*!
+ * @brief Command helper function to move stepper by a relative amount
+ *
+ * @note: Function is not completely safe, assumes valid command string
+ *
+ * @param stepper: pointer to stepper state structure
+ * @param cmd: pointer to command string
+ * @return: true on success, false on failure
+ */
+bool command_move_stepper_rotations(stepper_state_t* stepper, const char* cmd);
+
+/*!
+ * @brief Command helper function to move stepper by a relative amount
+ *
+ * @param stepper: pointer to stepper state structure
+ * @return: true on success, false on failure
+ */
+bool command_move_stepper_bump_down(stepper_state_t* stepper);
+
+/*!
+ * @brief Command helper function to stop stepper movement
+ *
+ * @param stepper: pointer to stepper state structure
+ * @return: true on success, false on failure
+ */
+bool command_stop_stepper(stepper_state_t* stepper);
+
+/*!
+ * @brief Command helper function to get stepper status
+ *
+ * @param stepper: pointer to stepper state structure
+ * @return: true on success, false on failure
+ */
+bool command_get_stepper_status(stepper_state_t* stepper);
 
 /*!
  * @brief Main function
@@ -295,10 +386,9 @@ int main()
                 // Reset for next command
                 printf("#: ");
                 cmd = NULL; // Clear command pointer, probably not necessary
-            }
-
-            
+            }  
         }
+
         if(ten_us_ticks_count > 0)
         {
             // Decrement the tick count
@@ -313,8 +403,7 @@ int main()
     }
 }
 
-/* -------------------------- helper functions -----------------------------*/
-
+/* -------------------------- LED helper functions -----------------------------*/
 int pico_led_init(void) 
 {
 #if defined(PICO_DEFAULT_LED_PIN)
@@ -340,205 +429,6 @@ void pico_set_led(bool led_on)
 #endif
 }
 
-bool timer_callback(struct repeating_timer *t)
-{
-    static int us_count = 0;
-    // This function is called every 10 microseconds
-    us_count++;
-    if (us_count >= (1000 / TIMER_INTERVAL_US)) // 100 calls = 1 ms
-    {
-        us_count = 0;
-        ms_ticks_count++;
-    }
-    ten_us_ticks_count++;
-    return true;    
-}
-
-int process_command(const char* cmd, stepper_state_t* stepper)
-{
-    // claw set position command
-    if (strncmp(cmd, CLAW_SET_POSITION_COMMAND, strlen(CLAW_SET_POSITION_COMMAND)) == 0) 
-    {
-        float position = atof(cmd + strlen(CLAW_SET_POSITION_COMMAND));
-
-        // Check if stepper is enabled
-        if(stepper->enabled == false)
-        {
-            printf("Error: Stepper motor is disabled. Enable it first.\n");
-        }
-        // Check for valid position
-        else if (position < 0 || position > 100)
-        {
-            printf("Error: Claw position must be between 0 and 100\n");
-        }
-        // Set the target position as a percentage of max stepper position
-        else
-        {
-            int new_stepper_position = (int)round((position * MAX_STEPPER_POSITION) / 100.0);
-            stepper_set_target_position(stepper, new_stepper_position);
-            stepper->moving = true; // Start moving
-            printf("Claw position set to %.2f%% (%d)\n", position, new_stepper_position);
-        }
-    }  
-    // command to set LED period
-    else if (strncmp(cmd, LED_PERIOD_COMMAND, strlen(LED_PERIOD_COMMAND)) == 0) 
-    {
-        int new_period = atoi(cmd + strlen(LED_PERIOD_COMMAND));
-        if (new_period > 0) 
-        {
-            led_period = new_period;
-        }
-        printf("LED period set to %d ms\n", led_period);
-    }
-    // command to set stepper period
-    else if(strncmp(cmd, SET_STEPPER_PERIOD_COMMAND, strlen(SET_STEPPER_PERIOD_COMMAND)) == 0)
-    {
-        int new_step_period = atoi(cmd + strlen(SET_STEPPER_PERIOD_COMMAND));
-        if(stepper_set_step_period(stepper, new_step_period))
-        {
-            printf("Stepper step period set to %d us\n", new_step_period);
-        }
-        else
-        {
-            printf("Error: Invalid step period\n");
-        }
-    }
-    // command to set stepper position to zero
-    else if(strncmp(cmd, SET_STEPPER_ZERO_COMMAND, strlen(SET_STEPPER_ZERO_COMMAND)) == 0)
-    {
-        stepper->current_position = 0;
-        stepper->target_position = 0;
-        stepper->moving = false;
-        printf("Stepper position set to zero\n");
-    }
-    // command to move stepper to absolute position
-    else if(strncmp(cmd, MOVE_STEPPER_ABSOLUTE_COMMAND, strlen(MOVE_STEPPER_ABSOLUTE_COMMAND)) == 0)
-    {
-        int target_position = atoi(cmd + strlen(MOVE_STEPPER_ABSOLUTE_COMMAND));
-        if(stepper->enabled == false)
-        {
-            printf("Error: Stepper motor is disabled. Enable it first.\n");
-        }
-        else if(stepper_set_target_position(stepper, target_position))
-        {
-            printf("Moving stepper to absolute position %d\n", target_position);
-            stepper->moving = true;
-        }
-        else
-        {
-            printf("Error: Invalid target position\n");
-        }
-    }
-    // command to move stepper by relative steps
-    else if(strncmp(cmd, MOVE_STEPPER_RELATIVE_COMMAND, strlen(MOVE_STEPPER_RELATIVE_COMMAND)) == 0)
-    {
-        int relative_steps = atoi(cmd + strlen(MOVE_STEPPER_RELATIVE_COMMAND));
-        int target_position = stepper->current_position + relative_steps;
-        if(stepper->enabled == false)
-        {
-            printf("Error: Stepper motor is disabled. Enable it first.\n");
-        }
-        else if(stepper_set_target_position(stepper, target_position))
-        {
-            printf("Moving stepper to relative position %d\n", target_position);
-            stepper->moving = true;
-        }
-        else
-        {
-            printf("Error: Invalid target position\n");
-        }
-    }
-    // command to move stepper by relative rotations
-    else if(strncmp(cmd, MOVE_STEPPER_ROTATIONS_COMMAND, strlen(MOVE_STEPPER_ROTATIONS_COMMAND)) == 0)
-    {
-        double relative_rotations = atof(cmd + strlen(MOVE_STEPPER_ROTATIONS_COMMAND));
-        int relative_steps = (int)round(relative_rotations * STEPPER_STEPS_PER_REV);
-        int target_position = stepper->current_position + relative_steps;
-        // Check if stepper is enabled
-        if(stepper->enabled == false)
-        {
-            printf("Error: Stepper motor is disabled. Enable it first.\n");
-        }
-        // Check for valid target position
-        else if(stepper_set_target_position(stepper, target_position))
-        {
-            printf("Moving stepper by %+f rotations to position %d\n", relative_rotations, target_position);
-            stepper->moving = true;
-        }
-        else
-        {
-            printf("Error: Invalid target position\n");
-        }
-    }
-    // command to bump stepper down by fixed amount
-    else if(strncmp(cmd, MOVE_STEPPER_BUMP_DOWN_COMMAND, strlen(MOVE_STEPPER_BUMP_DOWN_COMMAND)) == 0)
-    {
-        if(stepper->enabled == false)
-        {
-            printf("Error: Stepper motor is disabled. Enable it first.\n");
-        }
-        // Check if bump down is within current limits
-        else if(stepper->current_position > STEPPER_BUMP_STEPS)
-        {
-            printf("Bumping stepper down by %d steps\n", STEPPER_BUMP_STEPS);
-            stepper->target_position = stepper->current_position - STEPPER_BUMP_STEPS; //
-            stepper->moving = true;
-        }
-        // If bump down exceeds minimum position, reset to allow bump
-        else
-        {
-            printf("Bump down exceeds minimum position, resetting zero to allow bump\n");
-            stepper->current_position = STEPPER_BUMP_STEPS;  // Set current position to allow bump down
-            stepper->target_position = 0; // Set target position to zero
-            stepper->moving = true;
-        }
-    }
-    // command to stop stepper
-    else if(strncmp(cmd, STOP_STEPPER_COMMAND, strlen(STOP_STEPPER_COMMAND)) == 0)
-    {
-        if(stepper_stop(stepper))
-        {
-            printf("Stepper stopped at position %d\n", stepper->current_position);
-        }
-        else
-        {
-            printf("Error: Could not stop stepper\n");
-        }
-    }
-    // command to get stepper status
-    else if(strncmp(cmd, GET_STEPPER_STATUS_COMMAND, strlen(GET_STEPPER_STATUS_COMMAND)) == 0)
-    {
-        if(!stepper_get_status(stepper))
-        {
-            printf("Error: Could not get stepper status\n");
-        }
-    }
-    // command to enable stepper
-    else if(strncmp(cmd, ENABLE_STEPPER_COMMAND, strlen(ENABLE_STEPPER_COMMAND)) == 0)
-    {
-        stepper_enable(stepper, true);
-        printf("Stepper motor enabled\n");
-    }
-    // command to disable stepper
-    else if(strncmp(cmd, DISABLE_STEPPER_COMMAND, strlen(DISABLE_STEPPER_COMMAND)) == 0)
-    {
-        stepper_enable(stepper, false); 
-        printf("Stepper motor disabled\n");
-    }
-    // help command
-    else if (strncmp(cmd, "help", 4) == 0 || strncmp(cmd, "", 1) == 0) 
-    {
-        printf("%s", help_message);
-    }
-    // unknown command
-    else 
-    {
-        printf("Unknown command: \"%s\"\n-----\n", cmd);
-        printf("%s", help_message);
-    }
-    return 0;
-}
-
 void process_led_tick(void)
 {
     static int led_count = 0;
@@ -556,6 +446,122 @@ void process_led_tick(void)
         led_count = -1;
     }
     led_count++;
+}
+
+/* -------------------------- timer callback function -----------------------------*/
+/* Note: This function is called every 10 microseconds, it needs to be fast. so    */
+/* keep it minimal                                                                 */
+/* --------------------------------------------------------------------------------*/
+bool timer_callback(struct repeating_timer *t)
+{
+    static int us_count = 0;
+    // This function is called every 10 microseconds
+    us_count++;
+    if (us_count >= (1000 / TIMER_INTERVAL_US)) // 100 calls = 1 ms
+    {
+        us_count = 0;
+        ms_ticks_count++;
+    }
+    ten_us_ticks_count++;
+    return true;    
+}
+
+/* -------------------------- command processor -----------------------------*/
+bool process_command(const char* cmd, stepper_state_t* stepper)
+{
+    //check for null pointers
+    if (cmd == NULL || stepper == NULL)
+    {
+        return false;
+    }
+
+    // check that command is null terminated and within length limits
+    if(strnlen(cmd, MAX_COMMAND_LENGTH) >= MAX_COMMAND_LENGTH)
+    {
+        printf("Error: Command too long\n");
+        return false;
+    }
+
+    // claw set position command
+    if (strncmp(cmd, CLAW_SET_POSITION_COMMAND, strlen(CLAW_SET_POSITION_COMMAND)) == 0) 
+    {
+        return command_claw_set_position(stepper, cmd);
+    }  
+    // command to set LED period
+    else if (strncmp(cmd, LED_PERIOD_COMMAND, strlen(LED_PERIOD_COMMAND)) == 0) 
+    {
+        return command_set_led_period(cmd);
+    }
+    // command to set stepper period
+    else if(strncmp(cmd, SET_STEPPER_PERIOD_COMMAND, strlen(SET_STEPPER_PERIOD_COMMAND)) == 0)
+    {
+        return command_set_stepper_period(stepper, cmd);
+    }
+    // command to set stepper position to zero
+    else if(strncmp(cmd, SET_STEPPER_ZERO_COMMAND, strlen(SET_STEPPER_ZERO_COMMAND)) == 0)
+    {
+        return command_set_stepper_zero(stepper);
+    }
+    // command to move stepper to absolute position
+    else if(strncmp(cmd, MOVE_STEPPER_ABSOLUTE_COMMAND, strlen(MOVE_STEPPER_ABSOLUTE_COMMAND)) == 0)
+    {
+        return command_move_stepper_absolute(stepper, cmd);
+    }
+    // command to move stepper by relative steps
+    else if(strncmp(cmd, MOVE_STEPPER_RELATIVE_COMMAND, strlen(MOVE_STEPPER_RELATIVE_COMMAND)) == 0)
+    {
+        return command_move_stepper_relative(stepper, cmd);
+    }
+    // command to move stepper by relative rotations
+    else if(strncmp(cmd, MOVE_STEPPER_ROTATIONS_COMMAND, strlen(MOVE_STEPPER_ROTATIONS_COMMAND)) == 0)
+    {
+        return command_move_stepper_rotations(stepper, cmd);
+    }
+    // command to bump stepper down by fixed amount
+    else if(strncmp(cmd, MOVE_STEPPER_BUMP_DOWN_COMMAND, strlen(MOVE_STEPPER_BUMP_DOWN_COMMAND)) == 0)
+    {
+        return command_move_stepper_bump_down(stepper);
+    }
+    // command to stop stepper
+    else if(strncmp(cmd, STOP_STEPPER_COMMAND, strlen(STOP_STEPPER_COMMAND)) == 0)
+    {
+       return command_stop_stepper(stepper);
+    }
+    // command to get stepper status
+    else if(strncmp(cmd, GET_STEPPER_STATUS_COMMAND, strlen(GET_STEPPER_STATUS_COMMAND)) == 0)
+    {
+        return command_get_stepper_status(stepper);
+    }
+    // command to enable stepper
+    else if(strncmp(cmd, ENABLE_STEPPER_COMMAND, strlen(ENABLE_STEPPER_COMMAND)) == 0)
+    {
+        stepper_enable(stepper, true);
+        printf("Stepper motor enabled\n");
+        return true;
+    }
+    // command to disable stepper
+    else if(strncmp(cmd, DISABLE_STEPPER_COMMAND, strlen(DISABLE_STEPPER_COMMAND)) == 0)
+    {
+        stepper_enable(stepper, false); 
+        printf("Stepper motor disabled\n");
+        return true;
+    }
+    // help command
+    else if (strncmp(cmd, "help", 4) == 0 || strncmp(cmd, "", 1) == 0) 
+    {
+        printf("%s", help_message);
+        return true;
+    }
+    // unknown command
+    else 
+    {
+        printf("Unknown command: \"%s\"\n-----\n", cmd);
+        printf("%s", help_message);
+        return false;
+    }
+
+    // Should not reach here
+    return true;
 }
 
 char* process_stdin_input(void)
@@ -630,6 +636,252 @@ char* process_stdin_input(void)
     return result;
 }
 
+/* -------------------------- command helper functions -----------------------------*/
+/* Note: Command helper functions should be of the form of one of the following.    */
+/* bool function_name(stepper_state_t* stepper)                                     */
+/* bool function_name(stepper_state_t* stepper, bool value)                         */
+/* bool function_name(stepper_state_t* stepper, const char* command_string)         */
+/* bool function_name(const char* command_string)                                   */
+/* ---------------------------------------------------------------------------------*/
+bool command_get_stepper_status(stepper_state_t* stepper)
+{
+    if( stepper == NULL )
+    {
+        printf("Error: Could not get stepper status\n");
+        return false;
+    }
+
+    printf("Stepper Status:\n");
+    printf("  Current Position: %d\n", stepper->current_position);
+    printf("  Target Position: %d\n", stepper->target_position);
+    printf("  Step Period (us): %d\n", stepper->step_period * TIMER_INTERVAL_US);
+    printf("  Moving: %s\n", stepper->moving ? "Yes" : "No");
+    printf("  Enabled: %s\n", stepper->enabled ? "Yes" : "No");
+    return true;
+}
+
+bool command_claw_set_position(stepper_state_t* stepper, const char* cmd)
+{
+    float position = atof(cmd + strlen(CLAW_SET_POSITION_COMMAND));
+
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    // Check if stepper is enabled
+    if(stepper->enabled == false)
+    {
+        printf("Error: Stepper motor is disabled. Enable it first.\n");
+        return false;
+    }
+    // Check for valid position
+    else if (position < 0 || position > 100)
+    {
+        printf("Error: Claw position must be between 0 and 100\n");
+        return false;
+    }
+    // Set the target position as a percentage of max stepper position
+    else
+    {
+        int new_stepper_position = (int)round((position * MAX_STEPPER_POSITION) / 100.0);
+        stepper_set_target_position(stepper, new_stepper_position);
+        stepper->moving = true; // Start moving
+        printf("Claw position set to %.2f%% (%d)\n", position, new_stepper_position);
+        return true;
+    }
+}
+
+bool command_set_led_period(const char* cmd)
+{
+    int new_period = atoi(cmd + strlen(LED_PERIOD_COMMAND));
+    if (new_period > 0) 
+    {
+        led_period = new_period;
+        printf("LED period set to %d ms\n", led_period);
+        return true;
+    }
+    else
+    {
+        printf("Error: Invalid LED period\n");
+        return false;
+    }
+}
+
+bool command_set_stepper_period(stepper_state_t* stepper, const char* cmd)
+{
+    int new_step_period = atoi(cmd + strlen(SET_STEPPER_PERIOD_COMMAND));
+    
+    if( stepper == NULL )
+    {
+        return false;
+    }
+    
+    if(stepper_set_step_period(stepper, new_step_period))
+    {
+        printf("Stepper step period set to %d us\n", new_step_period);
+        return true;
+    }
+    else
+    {
+        printf("Error: Invalid step period\n");
+        return false;
+    }
+}
+
+bool command_set_stepper_zero(stepper_state_t* stepper)
+{
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    stepper->current_position = 0;
+    stepper->target_position = 0;
+    stepper->moving = false;
+    printf("Stepper position set to zero\n");
+    return true;
+}
+
+bool command_move_stepper_absolute(stepper_state_t* stepper, const char* cmd)
+{
+    int target_position = atoi(cmd + strlen(MOVE_STEPPER_ABSOLUTE_COMMAND));
+
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    if(stepper->enabled == false)
+    {
+        printf("Error: Stepper motor is disabled. Enable it first.\n");
+        return false;
+    }
+
+    if(stepper_set_target_position(stepper, target_position))
+    {
+        printf("Moving stepper to absolute position %d\n", target_position);
+        stepper->moving = true;
+        return true;
+    }
+    else
+    {
+        printf("Error: Invalid target position\n");
+        return false;
+    }
+}
+
+bool command_move_stepper_relative(stepper_state_t* stepper, const char* cmd)
+{
+    int relative_steps = atoi(cmd + strlen(MOVE_STEPPER_RELATIVE_COMMAND));
+    int target_position = stepper->current_position + relative_steps;
+
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    if(stepper->enabled == false)
+    {
+        printf("Error: Stepper motor is disabled. Enable it first.\n");
+        return false;
+    }
+
+    if(stepper_set_target_position(stepper, target_position))
+    {
+        printf("Moving stepper to relative position %d\n", target_position);
+        stepper->moving = true;
+        return true;
+    }
+    else
+    {
+        printf("Error: Invalid target position\n");
+        return false;
+    }
+}
+
+bool command_move_stepper_rotations(stepper_state_t* stepper, const char* cmd)
+{
+    double relative_rotations = atof(cmd + strlen(MOVE_STEPPER_ROTATIONS_COMMAND));
+    int relative_steps = (int)round(relative_rotations * STEPPER_STEPS_PER_REV);
+    int target_position = stepper->current_position + relative_steps;
+
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    if(stepper->enabled == false)
+    {
+        printf("Error: Stepper motor is disabled. Enable it first.\n");
+        return false;
+    }
+
+    if(stepper_set_target_position(stepper, target_position))
+    {
+        printf("Moving stepper by %+f rotations to position %d\n", relative_rotations, target_position);
+        stepper->moving = true;
+        return true;
+    }
+    else
+    {
+        printf("Error: Invalid target position\n");
+        return false;
+    }
+}
+
+bool command_move_stepper_bump_down(stepper_state_t* stepper)
+{
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    if(stepper->enabled == false)
+    {
+        printf("Error: Stepper motor is disabled. Enable it first.\n");
+        return false;
+    }
+
+    // Check if bump down is within current limits
+    if(stepper->current_position > STEPPER_BUMP_STEPS)
+    {
+        printf("Bumping stepper down by %d steps\n", STEPPER_BUMP_STEPS);
+        stepper->target_position = stepper->current_position - STEPPER_BUMP_STEPS; //
+        stepper->moving = true;
+        return true;
+    }
+    // If bump down exceeds minimum position, reset to allow bump
+    else
+    {
+        printf("Bump down exceeds minimum position, resetting zero to allow bump\n");
+        stepper->current_position = STEPPER_BUMP_STEPS;  // Set current position to allow bump down
+        stepper->target_position = 0; // Set target position to zero
+        stepper->moving = true;
+        return true;
+    }
+}
+
+bool command_stop_stepper(stepper_state_t* stepper)
+{
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    if(stepper_stop(stepper))
+    {
+        printf("Stepper stopped at position %d\n", stepper->current_position);
+        return true;
+    }
+    else
+    {
+        printf("Error: Could not stop stepper\n");
+        return false;
+    }
+}
+
+/* -------------------------- stepper helper functions -----------------------------*/
 bool stepper_init(stepper_state_t* stepper, int initial_position, int step_period)
 {
     if( stepper == NULL )
@@ -702,22 +954,6 @@ bool stepper_stop(stepper_state_t* stepper)
     return true;
 }
 
-bool stepper_get_status(stepper_state_t* stepper)
-{
-    if( stepper == NULL )
-    {
-        return false;
-    }
-
-    printf("Stepper Status:\n");
-    printf("  Current Position: %d\n", stepper->current_position);
-    printf("  Target Position: %d\n", stepper->target_position);
-    printf("  Step Period (us): %d\n", stepper->step_period * TIMER_INTERVAL_US);
-    printf("  Moving: %s\n", stepper->moving ? "Yes" : "No");
-    printf("  Enabled: %s\n", stepper->enabled ? "Yes" : "No");
-    return true;
-}
-
 bool stepper_enable(stepper_state_t* stepper, bool enable)
 {
     static bool gpio_initialized = false;
@@ -737,6 +973,8 @@ bool stepper_enable(stepper_state_t* stepper, bool enable)
     stepper->enabled = enable;
     return true;
 }
+
+/* -------------------------- stepper movement processing function -----------------------------*/
 
 bool process_stepper_movement(stepper_state_t* stepper)
 {
