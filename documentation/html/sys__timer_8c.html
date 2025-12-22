@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.16.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Claw Device Controller: claw.c File Reference</title>
+<title>Claw Device Controller: sys_timer.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('claw_8c.html','',''); });
+$(function(){initNavTree('sys__timer_8c.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -88,61 +88,94 @@ $(function(){initNavTree('claw_8c.html','',''); });
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">claw.c File Reference</div></div>
+  <div class="headertitle"><div class="title">sys_timer.c File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Firmware to control a claw device with stepper motors via USB serial commands.  
+<p>implementation of system timer and related global variables  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;stdio.h&gt;</code><br />
-<code>#include &quot;pico/stdlib.h&quot;</code><br />
+<div class="textblock"><code>#include &quot;pico/stdlib.h&quot;</code><br />
 <code>#include &quot;hardware/timer.h&quot;</code><br />
-<code>#include &lt;string.h&gt;</code><br />
-<code>#include &quot;pico/assert.h&quot;</code><br />
-<code>#include &lt;stdlib.h&gt;</code><br />
-<code>#include &quot;hardware/gpio.h&quot;</code><br />
-<code>#include &lt;ctype.h&gt;</code><br />
-<code>#include &lt;math.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="sys__timer_8h_source.html">sys_timer.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="stepper_8h_source.html">stepper.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="led_8h_source.html">led.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="command__processor_8h_source.html">command_processor.h</a>&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae66f6b31b5ad750f1fe042a706a4e3d4" id="r_ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#ae66f6b31b5ad750f1fe042a706a4e3d4">main</a> ()</td></tr>
-<tr class="memdesc:ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main function.  <br /></td></tr>
+<tr class="memitem:a9c64a585f107e6322134ec3e4d9caed0" id="r_a9c64a585f107e6322134ec3e4d9caed0"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a9c64a585f107e6322134ec3e4d9caed0">timer_callback</a> (struct repeating_timer *t)</td></tr>
+<tr class="memdesc:a9c64a585f107e6322134ec3e4d9caed0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Millisecond timer callback.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:af1b4a703a8b19086cc80aaf5467052f7" id="r_af1b4a703a8b19086cc80aaf5467052f7"><td class="memItemLeft">volatile int&#160;</td><td class="memItemRight"><a class="el" href="#af1b4a703a8b19086cc80aaf5467052f7">ten_us_ticks_count</a> = 0</td></tr>
+<tr class="memdesc:af1b4a703a8b19086cc80aaf5467052f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global ten microsecond ticks count.  <br /></td></tr>
+<tr class="memitem:a06a164f23588c789a6894f0bf8459ad5" id="r_a06a164f23588c789a6894f0bf8459ad5"><td class="memItemLeft">volatile int&#160;</td><td class="memItemRight"><a class="el" href="#a06a164f23588c789a6894f0bf8459ad5">ms_ticks_count</a> = 0</td></tr>
+<tr class="memdesc:a06a164f23588c789a6894f0bf8459ad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global millisecond ticks count.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Firmware to control a claw device with stepper motors via USB serial commands. </p>
+<div class="textblock"><p>implementation of system timer and related global variables </p>
 <dl class="section author"><dt>Author</dt><dd>Jon Wade </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>19 Dec 2025 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>20 Dec 2025 </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>(c) 2025 Jon Wade. Standard MIT License applies. See LICENSE file.</dd></dl>
-<p>Command interface for controlling stepper motors and other functions associated with the claw device. This file implements a simple command interface over USB serial to control the claw device. </p>
+<p>This file contains the timer callback function and related definitions for the system timer. </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="ae66f6b31b5ad750f1fe042a706a4e3d4" name="ae66f6b31b5ad750f1fe042a706a4e3d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae66f6b31b5ad750f1fe042a706a4e3d4">&#9670;&#160;</a></span>main()</h2>
+<a id="a9c64a585f107e6322134ec3e4d9caed0" name="a9c64a585f107e6322134ec3e4d9caed0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c64a585f107e6322134ec3e4d9caed0">&#9670;&#160;</a></span>timer_callback()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int main </td>
+          <td class="memname">bool timer_callback </td>
           <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td class="paramtype">struct repeating_timer *</td>          <td class="paramname"><span class="paramname"><em>t</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Main function. </p>
+<p>Millisecond timer callback. </p>
+<dl class="section note"><dt>Note</dt><dd>: This function is called every millisecond by the repeating timer.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"></td><td>none </td></tr>
+    <tr><td class="paramname">t</td><td>pointer to repeating_timer struct </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>: none </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>: true to keep repeating, false to stop </dd></dl>
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a06a164f23588c789a6894f0bf8459ad5" name="a06a164f23588c789a6894f0bf8459ad5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06a164f23588c789a6894f0bf8459ad5">&#9670;&#160;</a></span>ms_ticks_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">volatile int ms_ticks_count = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Global millisecond ticks count. </p>
+<p>This variable is incremented by the timer callback every 100 calls (1 ms = 100 * 10 us) and decremented in the main loop to track when the millisecond tasks should run. </p>
+
+</div>
+</div>
+<a id="af1b4a703a8b19086cc80aaf5467052f7" name="af1b4a703a8b19086cc80aaf5467052f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1b4a703a8b19086cc80aaf5467052f7">&#9670;&#160;</a></span>ten_us_ticks_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">volatile int ten_us_ticks_count = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Global ten microsecond ticks count. </p>
+<p>This variable is incremented by the timer callback and decremented in the main loop to track when the ten microsecond tasks should run. </p>
 
 </div>
 </div>
@@ -159,7 +192,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="claw_8c.html">claw.c</a></li>
+    <li class="navelem"><a href="sys__timer_8c.html">sys_timer.c</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.0 </li>
   </ul>
 </div>

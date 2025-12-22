@@ -35,7 +35,13 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(claw claw.c )
+add_executable(claw 
+    claw.c 
+    sys_timer.c
+    stepper.c
+    led.c
+    command_processor.c
+)
 
 pico_set_program_name(claw "claw")
 pico_set_program_version(claw "0.1")
