@@ -36,6 +36,7 @@
 #define GET_STEPPER_STATUS_COMMAND      "get_stepper_status"
 #define ENABLE_STEPPER_COMMAND          "enable_stepper"
 #define DISABLE_STEPPER_COMMAND         "disable_stepper"
+#define ECHO_COMMAND                    "echo "
 
 /*! 
  * @brief Help message
@@ -57,8 +58,11 @@ const char* help_message =
     "  get_stepper_status                 - Get the current status of the stepper motor\n"
     "  enable_stepper                     - Enable the stepper motor\n"
     "  disable_stepper                    - Disable the stepper motor\n"
+    "  echo <on|off>                      - Enable or disable command echoing\n"
     "  help                               - Show this help message\n"
     "-----\n";
+
+bool echo_command = true;
 
 /* -------------------------- command processor -----------------------------*/
 bool process_command(const char* cmd, stepper_state_t* stepper)
@@ -146,6 +150,11 @@ bool process_command(const char* cmd, stepper_state_t* stepper)
         printf("%s", help_message);
         return true;
     }
+    // command to set echo on or off
+    else if (strncmp(cmd, ECHO_COMMAND, strlen(ECHO_COMMAND)) == 0)
+    {
+        return command_set_echo(cmd);
+    }
     // unknown command
     else 
     {
@@ -188,24 +197,28 @@ char* process_stdin_input(void)
         {
             cmd_buffer[cmd_buffer_index] = '\0';
             process_cmd = true;
-            putchar('\n');
+            if(echo_command == true)
+                putchar('\n');
         }
         // Handle backspace
         else if((cmd_buffer[cmd_buffer_index] == '\b' || cmd_buffer[cmd_buffer_index] == 127) && cmd_buffer_index > 0)
         {
             cmd_buffer_index--;
-            putchar('\b');
-            putchar(' ');
-            putchar('\b');
+            if(echo_command == true)
+            {
+                putchar('\b');
+                putchar(' ');
+                putchar('\b');
+            }
         }
-
         // Echo the character and increment index
         else
         {
             // Only accept printable characters
             if((!iscntrl(cmd_buffer[cmd_buffer_index])) && (cmd_buffer[cmd_buffer_index] != '\b' && cmd_buffer[cmd_buffer_index] != 127))
             {
-                putchar(cmd_buffer[cmd_buffer_index]);
+                if(echo_command == true)
+                    putchar(cmd_buffer[cmd_buffer_index]);
                 cmd_buffer_index++;
             }
         }
@@ -251,6 +264,7 @@ bool command_get_stepper_status(stepper_state_t* stepper)
     printf("  Step Period (us): %d\n", stepper->step_period * TIMER_INTERVAL_US);
     printf("  Moving: %s\n", stepper->moving ? "Yes" : "No");
     printf("  Enabled: %s\n", stepper->enabled ? "Yes" : "No");
+    printf("  Estop: %s\n", stepper_is_estop_active(stepper) ? "Active" : "Inactive");
     return true;
 }
 
@@ -471,6 +485,28 @@ bool command_stop_stepper(stepper_state_t* stepper)
     else
     {
         printf("Error: Could not stop stepper\n");
+        return false;
+    }
+}
+
+bool command_set_echo(const char* cmd)
+{
+    const char* param = cmd + strlen(ECHO_COMMAND);
+
+    if (strncmp(param, "on", 2) == 0) 
+    {
+        echo_command = true;
+        printf("Command echoing enabled\n");
+        return true;
+    }
+    else if (strncmp(param, "off", 3) == 0) 
+    {
+        echo_command = false;
+        return true;
+    }
+    else
+    {
+        printf("Error: Invalid parameter for echo command. Use 'on' or 'off'.\n");
         return false;
     }
 }

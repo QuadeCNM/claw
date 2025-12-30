@@ -6,6 +6,7 @@ var command__processor_8h =
     [ "command_move_stepper_bump_down", "command__processor_8h.html#ad6ccbb815b5fb68428a4295057978c84", null ],
     [ "command_move_stepper_relative", "command__processor_8h.html#a4a263a163e903e9d6d145efdab73ef2a", null ],
     [ "command_move_stepper_rotations", "command__processor_8h.html#a464edc31150d224bb2e5b2677e83e36d", null ],
+    [ "command_set_echo", "command__processor_8h.html#aaaea4b67b446752aa7c5d55c13862570", null ],
     [ "command_set_led_period", "command__processor_8h.html#a57d3eb41c21eca1aa8d80347168e3fd2", null ],
     [ "command_set_stepper_period", "command__processor_8h.html#a14d08202159ad556bd112de6cd9e9e96", null ],
     [ "command_set_stepper_zero", "command__processor_8h.html#af94654c3bdeec030862859729dafd127", null ],

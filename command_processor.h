@@ -136,4 +136,16 @@ bool command_stop_stepper(stepper_state_t* stepper);
  */
 bool command_get_stepper_status(stepper_state_t* stepper);
 
+/*!
+ * @brief Command helper function to set command echoing
+ *
+ * This command enables or disables echoing of input characters back to the user.
+ *
+ * @note: Function is not completely safe, assumes valid command string
+ *
+ * @param cmd: pointer to command string
+ * @return: true on success, false on failure
+ */
+bool command_set_echo(const char* cmd);
+
 #endif // COMMAND_PROCESSOR_H

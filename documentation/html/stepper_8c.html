@@ -111,6 +111,12 @@ Functions</h2></td></tr>
 <tr class="memdesc:a2618732501f937687962beecaedfe2f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop the stepper motor, setting target position to current position.  <br /></td></tr>
 <tr class="memitem:a3d6f069e05a71350694c2df3e16afb2c" id="r_a3d6f069e05a71350694c2df3e16afb2c"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a3d6f069e05a71350694c2df3e16afb2c">stepper_enable</a> (stepper_state_t *stepper, bool enable)</td></tr>
 <tr class="memdesc:a3d6f069e05a71350694c2df3e16afb2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the stepper motor.  <br /></td></tr>
+<tr class="memitem:ad24f18abdcf8e0bc49a235f28776ab18" id="r_ad24f18abdcf8e0bc49a235f28776ab18"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#ad24f18abdcf8e0bc49a235f28776ab18">stepper_is_estop_active</a> (stepper_state_t *stepper)</td></tr>
+<tr class="memdesc:ad24f18abdcf8e0bc49a235f28776ab18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the estop is active and set estop status LED appropriately.  <br /></td></tr>
+<tr class="memitem:a44749cb57ef4b2484a6e10d23b92a783" id="r_a44749cb57ef4b2484a6e10d23b92a783"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a44749cb57ef4b2484a6e10d23b92a783">process_stepper_estop</a> (stepper_state_t *stepper)</td></tr>
+<tr class="memdesc:a44749cb57ef4b2484a6e10d23b92a783"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process stepper estop input.  <br /></td></tr>
+<tr class="memitem:a375047b7d8b4e109feb74a84e22a3a22" id="r_a375047b7d8b4e109feb74a84e22a3a22"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a375047b7d8b4e109feb74a84e22a3a22">process_stepper_enabled_led</a> (stepper_state_t *stepper)</td></tr>
+<tr class="memdesc:a375047b7d8b4e109feb74a84e22a3a22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process stepper enabled LED.  <br /></td></tr>
 <tr class="memitem:a42d78cd362181f20ff7bb0ca012d4b68" id="r_a42d78cd362181f20ff7bb0ca012d4b68"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a42d78cd362181f20ff7bb0ca012d4b68">process_stepper_movement</a> (stepper_state_t *stepper)</td></tr>
 <tr class="memdesc:a42d78cd362181f20ff7bb0ca012d4b68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process stepper movement.  <br /></td></tr>
 </table>
@@ -121,6 +127,58 @@ Functions</h2></td></tr>
 <dl class="section copyright"><dt>Copyright</dt><dd>(c) 2025 Jon Wade. Standard MIT License applies. See LICENSE file.</dd></dl>
 <p>This file contains the implementation of functions for controlling a stepper motor. </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a375047b7d8b4e109feb74a84e22a3a22" name="a375047b7d8b4e109feb74a84e22a3a22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a375047b7d8b4e109feb74a84e22a3a22">&#9670;&#160;</a></span>process_stepper_enabled_led()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool process_stepper_enabled_led </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Process stepper enabled LED. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="a44749cb57ef4b2484a6e10d23b92a783" name="a44749cb57ef4b2484a6e10d23b92a783"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44749cb57ef4b2484a6e10d23b92a783">&#9670;&#160;</a></span>process_stepper_estop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool process_stepper_estop </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Process stepper estop input. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true if estop is active, false otherwise </dd></dl>
+
+</div>
+</div>
 <a id="a42d78cd362181f20ff7bb0ca012d4b68" name="a42d78cd362181f20ff7bb0ca012d4b68"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a42d78cd362181f20ff7bb0ca012d4b68">&#9670;&#160;</a></span>process_stepper_movement()</h2>
 
@@ -212,6 +270,32 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="ad24f18abdcf8e0bc49a235f28776ab18" name="ad24f18abdcf8e0bc49a235f28776ab18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad24f18abdcf8e0bc49a235f28776ab18">&#9670;&#160;</a></span>stepper_is_estop_active()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool stepper_is_estop_active </td>
+          <td>(</td>
+          <td class="paramtype">stepper_state_t *</td>          <td class="paramname"><span class="paramname"><em>stepper</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if the estop is active and set estop status LED appropriately. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true if estop is active, false otherwise </dd></dl>
 
 </div>
 </div>

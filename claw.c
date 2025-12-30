@@ -82,7 +82,13 @@ int main()
                 // Reset for next command
                 printf("#: ");
                 cmd = NULL; // Clear command pointer, probably not necessary
-            }  
+            }
+            
+            // Process stepper estop input and stepper status LEDs
+            process_stepper_estop(&stepper);
+
+            // Process stepper enabled LED
+            process_stepper_enabled_led(&stepper);
         }
 
         // Process ten microsecond tasks

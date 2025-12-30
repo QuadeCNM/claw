@@ -38,6 +38,17 @@ bool stepper_init(stepper_state_t* stepper, int initial_position, int step_perio
     stepper->moving = false;
     stepper->enabled = false;
     stepper_enable(stepper, false); // Disable stepper motor initially
+
+    // Initialise optional GPIO pins for stepper status LEDs and estop input
+    gpio_init(STEPPER_ENABLE_LED_PIN);
+    gpio_set_dir(STEPPER_ENABLE_LED_PIN, GPIO_OUT);
+    gpio_put(STEPPER_ENABLE_LED_PIN, STEPPER_ENABLE_LED_PIN_ACTIVE_LEVEL); // Turn on enable LED
+    gpio_init(STEPPER_ESTOP_LED_PIN);
+    gpio_set_dir(STEPPER_ESTOP_LED_PIN, GPIO_OUT);
+    gpio_put(STEPPER_ESTOP_LED_PIN, STEPPER_ESTOP_ACTIVE_LEVEL); // TURN on estop LED
+    gpio_init(STEPPER_ESTOP_PIN);
+    gpio_set_dir(STEPPER_ESTOP_PIN, GPIO_IN);
+    gpio_pull_up(STEPPER_ESTOP_PIN);
     
     return true;
 }
@@ -106,6 +117,84 @@ bool stepper_enable(stepper_state_t* stepper, bool enable)
     stepper->enabled = enable;
     return true;
 }
+
+
+
+bool stepper_is_estop_active(stepper_state_t* stepper)
+{
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    // Read estop input pin
+    if(gpio_get(STEPPER_ESTOP_PIN) == STEPPER_ESTOP_ACTIVE_LEVEL)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool process_stepper_estop(stepper_state_t* stepper)
+{
+    static int extop_active_count = 0;
+
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    // Read estop input pin
+    if(gpio_get(STEPPER_ESTOP_PIN) == STEPPER_ESTOP_ACTIVE_LEVEL)
+    {
+        // Estop is active, disable stepper motor
+        stepper_enable(stepper, false);
+        gpio_put(STEPPER_ESTOP_LED_PIN, STEPPER_ESTOP_LED_PIN_ACTIVE_LEVEL);
+        stepper->moving = false; // Stop any movement
+        stepper->target_position = stepper->current_position; // Set target to current position
+        extop_active_count = STEPPER_ESTOP_DEACTIVATE_DELAY_MS; // Reset deactivate delay counter
+        return true;
+    }
+    else
+    {
+        // Decrement estop deactivate delay counter
+        if(extop_active_count > 0)
+        {
+            extop_active_count--;
+            // Keep estop active until delay expires
+            gpio_put(STEPPER_ESTOP_LED_PIN, STEPPER_ESTOP_LED_PIN_ACTIVE_LEVEL);
+            return true;
+        }
+        else
+        {
+            // Estop is not active, enable stepper motor if it was previously enabled
+            gpio_put(STEPPER_ESTOP_LED_PIN, STEPPER_ESTOP_LED_PIN_ACTIVE_LEVEL ^ 1 );
+            return false;
+        }
+    }
+}
+
+bool process_stepper_enabled_led(stepper_state_t* stepper)
+{
+    if( stepper == NULL )
+    {
+        return false;
+    }
+
+    // Set moving LED based on stepper moving status
+    if(stepper->enabled)
+    {
+        gpio_put(STEPPER_ENABLE_LED_PIN, STEPPER_ENABLE_LED_PIN_ACTIVE_LEVEL);
+    }
+    else
+    {
+        gpio_put(STEPPER_ENABLE_LED_PIN, STEPPER_ENABLE_LED_PIN_ACTIVE_LEVEL ^ 1);
+    }
+    return true;
+}   
 
 /* -------------------------- stepper movement processing function -----------------------------*/
 

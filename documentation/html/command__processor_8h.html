@@ -124,6 +124,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a7e81b537715fa4d2d66f1abd426b9ae8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to stop stepper movement.  <br /></td></tr>
 <tr class="memitem:aeecf38a2babf080abfeba6a9a8be07e7" id="r_aeecf38a2babf080abfeba6a9a8be07e7"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#aeecf38a2babf080abfeba6a9a8be07e7">command_get_stepper_status</a> (stepper_state_t *stepper)</td></tr>
 <tr class="memdesc:aeecf38a2babf080abfeba6a9a8be07e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to get stepper status.  <br /></td></tr>
+<tr class="memitem:aaaea4b67b446752aa7c5d55c13862570" id="r_aaaea4b67b446752aa7c5d55c13862570"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#aaaea4b67b446752aa7c5d55c13862570">command_set_echo</a> (const char *cmd)</td></tr>
+<tr class="memdesc:aaaea4b67b446752aa7c5d55c13862570"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command helper function to set command echoing.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Definitions, functions and variables for command processing. </p>
@@ -304,6 +306,34 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">stepper</td><td>pointer to stepper state structure </td></tr>
+    <tr><td class="paramname">cmd</td><td>pointer to command string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>: true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="aaaea4b67b446752aa7c5d55c13862570" name="aaaea4b67b446752aa7c5d55c13862570"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaaea4b67b446752aa7c5d55c13862570">&#9670;&#160;</a></span>command_set_echo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool command_set_echo </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Command helper function to set command echoing. </p>
+<p>This command enables or disables echoing of input characters back to the user.</p>
+<dl class="section note"><dt>Note</dt><dd>: Function is not completely safe, assumes valid command string</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
     <tr><td class="paramname">cmd</td><td>pointer to command string </td></tr>
   </table>
   </dd>
